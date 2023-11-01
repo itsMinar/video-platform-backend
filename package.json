@@ -1,0 +1,19 @@
+{
+  "name": "video-platform-backend",
+  "version": "1.0.0",
+  "description": "backend of a video platform",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "Md. Minar Munshi",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.3"
+  }
+}
