@@ -17,9 +17,11 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 // routes import
+const healthcheckRouter = require('./routes/healthcheck.routes.js');
 const userRouter = require('./routes/user.routes.js');
 
 // routes declaration
+app.use('/api/v1/healthcheck', healthcheckRouter);
 app.use('/api/v1/users', userRouter);
 
 module.exports = { app };
