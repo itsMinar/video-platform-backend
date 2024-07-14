@@ -1,21 +1,19 @@
-const { Router } = require('express');
+const router = require('express').Router();
+const { upload } = require('../middlewares/multer.middleware.js');
+const { verifyJWT } = require('../middlewares/auth.middleware.js');
 const {
   registerUser,
   loginUser,
   logoutUser,
   refreshAccessToken,
-  changeCurrentPassword,
   getCurrentUser,
+  changeCurrentPassword,
   updateAccountDetails,
   updateUserAvatar,
   updateUserCoverImage,
   getUserChannelProfile,
   getWatchHistory,
-} = require('../controllers/user.controller.js');
-const { upload } = require('../middlewares/multer.middleware.js');
-const { verifyJWT } = require('../middlewares/auth.middleware.js');
-
-const router = Router();
+} = require('../controllers/users');
 
 router.route('/register').post(
   upload.fields([
