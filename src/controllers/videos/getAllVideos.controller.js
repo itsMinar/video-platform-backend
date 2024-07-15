@@ -3,21 +3,79 @@ const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 
 const getAllVideos = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
+  const {
+    page = 1,
+    limit = 10,
+    query,
+    sortBy = 'createdAt',
+    sortType = 'desc',
+    userId,
+  } = req.query;
 
-  const videos = await Video.find();
+  const pageInt = parseInt(page, 10);
+  const limitInt = parseInt(limit, 10);
+  const skip = (pageInt - 1) * limitInt;
 
-  // return response
+  // Create a filter object for aggregation
+  let match = {};
+  if (query) {
+    match = { ...match, title: { $regex: query, $options: 'i' } };
+  }
+  if (userId) {
+    match = { ...match, userId };
+  }
+
+  // Build the aggregation pipeline
+  const aggregationPipeline = [
+    { $match: match },
+    { $sort: { [sortBy]: sortType === 'desc' ? -1 : 1 } },
+    {
+      $facet: {
+        metadata: [{ $count: 'total' }],
+        data: [{ $skip: skip }, { $limit: limitInt }],
+      },
+    },
+    {
+      $unwind: {
+        path: '$metadata',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $project: {
+        total: '$metadata.total',
+        data: 1,
+      },
+    },
+  ];
+
+  const results = await Video.aggregate(aggregationPipeline);
+  const result = results[0] || { total: 0, data: [] };
+
+  const totalVideos = result.total;
+  const totalPages = Math.ceil(totalVideos / limitInt);
+
+  // Calculate pagination details
+  const pagination = {
+    page: pageInt,
+    limit: limitInt,
+    first: 1,
+    last: totalPages,
+    prev: pageInt > 1 ? pageInt - 1 : null,
+    next: pageInt < totalPages ? pageInt + 1 : null,
+    totalPage: totalPages,
+    totalVideos: totalVideos,
+  };
+
+  // Return response
   return res.status(200).json(
     new ApiResponse(
       200,
       {
-        videos,
-        pagination: {
-          totalPage: 'Added soon...',
-        },
+        videos: result.data,
+        pagination,
       },
-      'Videos fetched Successfully'
+      'Videos Retrieval Successfully'
     )
   );
 });
