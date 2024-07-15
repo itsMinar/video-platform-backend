@@ -1,0 +1,34 @@
+version: '3'
+services:
+  # MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: minar
+      MONGO_INITDB_ROOT_PASSWORD: minar007
+    volumes:
+      - my_mongodb_data:/data/db
+    ports:
+      - 27017:27017
+
+  # Mongo Express
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: minar
+      ME_CONFIG_MONGODB_ADMINPASSWORD: minar007
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH: false
+    ports:
+      - 8081:8081
+    depends_on:
+      - mongodb
+
+volumes:
+  my_mongodb_data:
+    driver: local
+# docker-compose up -d
