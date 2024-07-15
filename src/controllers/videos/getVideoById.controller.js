@@ -5,7 +5,15 @@ const { asyncHandler } = require('../../utils/asyncHandler');
 const getVideoById = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
 
-  const video = await Video.findById(videoId).populate('owner', 'fullName');
+  const video = await Video.findById(videoId).populate(
+    'owner',
+    'fullName avatar username'
+  );
+
+  // increase view count
+  video.views++;
+
+  await video.save();
 
   // return response
   return res

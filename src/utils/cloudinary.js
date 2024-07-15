@@ -27,4 +27,38 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 };
 
-module.exports = { uploadOnCloudinary };
+const deleteVideoFromCloudinary = async (videoId) => {
+  try {
+    const response = await cloudinary.api.delete_resources([videoId], {
+      type: 'upload',
+      resource_type: 'video',
+    });
+
+    return response;
+  } catch (error) {
+    console.log('🚀 ~ deleteVideoFromCloudinary ~ error:', error);
+
+    throw new Error('Failed to delete video from Cloudinary');
+  }
+};
+
+const deleteImageFromCloudinary = async (imageId) => {
+  try {
+    const response = await cloudinary.api.delete_resources([imageId], {
+      type: 'upload',
+      resource_type: 'image',
+    });
+
+    return response;
+  } catch (error) {
+    console.log('🚀 ~ deleteImageFromCloudinary ~ error:', error);
+
+    throw new Error('Failed to delete image from Cloudinary');
+  }
+};
+
+module.exports = {
+  uploadOnCloudinary,
+  deleteVideoFromCloudinary,
+  deleteImageFromCloudinary,
+};
