@@ -5,7 +5,7 @@ const { asyncHandler } = require('../../utils/asyncHandler');
 const { uploadOnCloudinary } = require('../../utils/cloudinary');
 
 const registerUser = asyncHandler(async (req, res) => {
-  // get user details from frontend
+  // get user details from client
   const { fullName, email, username, password } = req.body;
 
   // validation - not empty
