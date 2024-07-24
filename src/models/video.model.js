@@ -5,23 +5,23 @@ const videoSchema = new Schema(
   {
     videoFile: {
       type: String,
-      required: true,
+      required: [true, 'Video file is Required!'],
     },
     thumbnail: {
       type: String,
-      required: true,
+      required: [true, 'Video thumbnail is Required!'],
     },
     title: {
       type: String,
-      required: true,
+      required: [true, 'Video title is Required!'],
     },
     description: {
       type: String,
-      required: true,
+      required: [true, 'Video description is Required!'],
     },
     duration: {
       type: Number,
-      required: true,
+      required: [true, 'Video duration is Required!'],
     },
     views: {
       type: Number,
@@ -36,9 +36,7 @@ const videoSchema = new Schema(
       ref: 'User',
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 videoSchema.plugin(mongooseAggregatePaginate);

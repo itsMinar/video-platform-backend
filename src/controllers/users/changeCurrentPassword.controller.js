@@ -6,6 +6,11 @@ const { asyncHandler } = require('../../utils/asyncHandler');
 const changeCurrentPassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
+  // validation - not empty
+  if ([oldPassword, newPassword].some((field) => field?.trim() === '')) {
+    throw new ApiError(400, 'All fields are required');
+  }
+
   const user = await User.findById(req.user?._id);
 
   const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);

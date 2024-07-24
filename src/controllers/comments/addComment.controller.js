@@ -1,3 +1,4 @@
+const { isValidObjectId } = require('mongoose');
 const { Comment } = require('../../models/comment.model');
 const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
@@ -7,8 +8,13 @@ const addComment = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   const { content } = req.body;
 
+  // check valid videoId
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(404, 'Invalid Video ID');
+  }
+
   // validation - not empty
-  if (!content || !videoId) {
+  if (!content) {
     throw new ApiError(400, 'All fields are required');
   }
 

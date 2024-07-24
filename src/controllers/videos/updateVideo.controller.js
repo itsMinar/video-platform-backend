@@ -1,3 +1,4 @@
+const { isValidObjectId } = require('mongoose');
 const { Video } = require('../../models/video.model');
 const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
@@ -7,6 +8,11 @@ const { uploadOnCloudinary } = require('../../utils/cloudinary');
 const updateVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   const { title, description } = req.body;
+
+  // check valid videoId
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(404, 'Invalid Video ID');
+  }
 
   const video = await Video.findById(videoId).populate('owner', 'fullName');
 

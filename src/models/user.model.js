@@ -7,7 +7,7 @@ const userSchema = new Schema(
   {
     username: {
       type: String,
-      required: true,
+      required: [true, 'Username is Required!'],
       unique: true,
       lowercase: true,
       trim: true,
@@ -15,20 +15,20 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      required: true,
+      required: [true, 'Email is Required!'],
       unique: true,
       lowercase: true,
       trim: true,
     },
     fullName: {
       type: String,
-      required: true,
+      required: [true, 'Full Name is Required!'],
       trim: true,
       index: true,
     },
     avatar: {
       type: String, //cloudinary url
-      required: true,
+      required: [true, 'User Avatar is Required!'],
     },
     coverImage: {
       type: String, //cloudinary url
@@ -47,9 +47,7 @@ const userSchema = new Schema(
       type: String,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 // always write the callback by this function definition

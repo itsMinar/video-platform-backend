@@ -1,3 +1,4 @@
+const { isValidObjectId } = require('mongoose');
 const { Comment } = require('../../models/comment.model');
 const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
@@ -7,8 +8,13 @@ const updateComment = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
   const { content } = req.body;
 
+  // check valid commentId
+  if (!isValidObjectId(commentId)) {
+    throw new ApiError(404, 'Invalid Comment ID');
+  }
+
   // validation - not empty
-  if (!content || !commentId) {
+  if (!content) {
     throw new ApiError(400, 'All fields are required');
   }
 

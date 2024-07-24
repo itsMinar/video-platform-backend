@@ -16,7 +16,7 @@ const uploadOnCloudinary = async (localFilePath) => {
       resource_type: 'auto',
     });
 
-    // file has been uploaded successfully
+    // remove the locally saved temporary file as the file has been uploaded successfully
     fs.unlinkSync(localFilePath);
 
     return response;
@@ -26,6 +26,8 @@ const uploadOnCloudinary = async (localFilePath) => {
     return null;
   }
 };
+
+// ===================================================================
 
 const deleteVideoFromCloudinary = async (videoId) => {
   try {
@@ -57,8 +59,37 @@ const deleteImageFromCloudinary = async (imageId) => {
   }
 };
 
+// ===================================================================
+
+const deleteFromCloudinary = async (contentId, contentType) => {
+  try {
+    // delete the file from cloudinary
+    const response = await cloudinary.api.delete_resources([contentId], {
+      type: 'upload',
+      resource_type: 'auto',
+      // resource_type: contentType,
+    });
+
+    return response;
+  } catch (error) {
+    console.log('🚀 ~ deleteFromCloudinary ~ error:', error);
+
+    throw new Error('Failed to delete content from Cloudinary');
+  }
+};
+
+// get the cloudinary id of content from url
+const getCloudinaryId = (contentUrl) => {
+  return contentUrl
+    .split('/')
+    .pop()
+    .replace(/\.[^.]+$/, '');
+};
+
 module.exports = {
   uploadOnCloudinary,
   deleteVideoFromCloudinary,
   deleteImageFromCloudinary,
+  deleteFromCloudinary,
+  getCloudinaryId,
 };

@@ -3,16 +3,19 @@
   "version": "1.0.0",
   "description": "backend of a video platform",
   "main": "index.js",
-  "scripts": {
-    "dev": "nodemon src/index.js"
-  },
   "keywords": [
     "javascript",
     "express",
-    "mongodb"
+    "mongodb",
+    "mongoose",
+    "api"
   ],
-  "author": "Md. Minar Munshi",
   "license": "ISC",
+  "author": "Md. Minar Munshi",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cloudinary": "^1",

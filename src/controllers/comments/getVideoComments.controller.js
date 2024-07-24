@@ -1,11 +1,17 @@
-const mongoose = require('mongoose');
-const { Video } = require('../../models/video.model');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { Comment } = require('../../models/comment.model');
+const { isValidObjectId } = require('mongoose');
 
 const getVideoComments = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
+
+  // check valid videoId
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(404, 'Invalid Video ID');
+  }
+
+  // TODO: do it properly
 
   const allComments = await Comment.find();
 
