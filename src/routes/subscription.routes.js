@@ -6,7 +6,8 @@ const {
   toggleSubscription,
 } = require('../controllers/subscriptions');
 
-router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
+// Apply verifyJWT middleware to all routes in this file
+router.use(verifyJWT);
 
 router
   .route('/c/:channelId')

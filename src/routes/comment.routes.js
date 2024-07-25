@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const { upload } = require('../middlewares/multer.middleware.js');
 const { verifyJWT } = require('../middlewares/auth.middleware.js');
 const {
   getVideoComments,

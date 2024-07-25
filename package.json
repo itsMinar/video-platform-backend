@@ -5,13 +5,18 @@
   "main": "index.js",
   "keywords": [
     "javascript",
+    "nodejs",
     "express",
     "mongodb",
     "mongoose",
     "api"
   ],
   "license": "ISC",
-  "author": "Md. Minar Munshi",
+  "author": {
+    "name": "Md. Minar Munshi",
+    "url": "https://github.com/itsMinar",
+    "email": "minarmunshi46@gmail.com"
+  },
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js"
