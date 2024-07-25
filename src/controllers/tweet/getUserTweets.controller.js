@@ -1,10 +1,10 @@
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { ApiResponse } = require('../../utils/ApiResponse');
-const { Subscription } = require('../../models/subscription.model');
 const { ApiError } = require('../../utils/ApiError');
 const { isValidObjectId } = require('mongoose');
 
 const getUserTweets = asyncHandler(async (req, res) => {
+  // TODO: will do this
   const { channelId } = req.params;
 
   // check valid channelId
