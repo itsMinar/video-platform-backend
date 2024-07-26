@@ -4,7 +4,9 @@ const { asyncHandler } = require('../../utils/asyncHandler');
 
 const getChannelVideos = asyncHandler(async (req, res) => {
   // return response
-  return res.status(201).json(new ApiResponse(201, null, 'Successfully'));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, 'Videos Successfully'));
 });
 
 module.exports = getChannelVideos;

@@ -7,7 +7,7 @@ const { ApiResponse } = require('../../utils/ApiResponse');
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken =
-    rer.cookies.refreshToken || req.body.refreshToken;
+    req.cookies.refreshToken || req.body.refreshToken;
 
   if (!incomingRefreshToken) {
     throw new ApiError(401, 'Unauthorized request');
@@ -19,9 +19,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       process.env.REFRESH_TOKEN_SECRET
     );
 
-    const user = await User.findById(decodedToken?._id).select(
-      '-password -refreshToken'
-    );
+    const user = await User.findById(decodedToken?._id).select('refreshToken');
 
     if (!user) {
       throw new ApiError(401, 'Invalid Refresh Token');

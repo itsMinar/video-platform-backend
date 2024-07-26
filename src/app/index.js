@@ -20,7 +20,7 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 // routes import
-const healthcheckRouter = require('../routes/healthcheck.routes.js');
+const healthCheckRouter = require('../routes/healthCheck.routes.js');
 const userRouter = require('../routes/user.routes.js');
 const videoRouter = require('../routes/video.routes.js');
 const subscriptionRouter = require('../routes/subscription.routes.js');
@@ -31,7 +31,7 @@ const dashboardRouter = require('../routes/dashboard.routes.js');
 const tweetRouter = require('../routes/tweet.routes.js');
 
 // routes declaration
-app.use('/api/v1/healthcheck', healthcheckRouter);
+app.use('/api/v1/health-check', healthCheckRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/videos', videoRouter);
 app.use('/api/v1/subscriptions', subscriptionRouter);
