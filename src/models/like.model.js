@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const mongooseAggregatePaginate = require('mongoose-aggregate-paginate-v2');
 
 // create Like schema
 const likeSchema = new Schema(
@@ -22,6 +23,8 @@ const likeSchema = new Schema(
   },
   { timestamps: true }
 );
+
+likeSchema.plugin(mongooseAggregatePaginate);
 
 // create Like model
 const Like = model('Like', likeSchema);

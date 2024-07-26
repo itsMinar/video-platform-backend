@@ -1,6 +1,7 @@
 const { Schema, model } = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const mongooseAggregatePaginate = require('mongoose-aggregate-paginate-v2');
 
 // create User schema
 const userSchema = new Schema(
@@ -89,6 +90,8 @@ userSchema.methods.generateRefreshToken = function () {
     }
   );
 };
+
+userSchema.plugin(mongooseAggregatePaginate);
 
 // create User model
 const User = model('User', userSchema);
