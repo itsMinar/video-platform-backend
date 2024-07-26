@@ -2,7 +2,11 @@ const { User } = require('../../models/user.model');
 const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
-const { uploadOnCloudinary } = require('../../utils/cloudinary');
+const {
+  uploadOnCloudinary,
+  getCloudinaryId,
+  deleteFromCloudinary,
+} = require('../../utils/cloudinary');
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.file?.path;
@@ -16,6 +20,23 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
   if (!coverImage.url) {
     throw new ApiError(400, 'Error while uploading on Cover Image');
+  }
+
+  // find the coverImageId from the user cover image url
+  const coverImageIdOfCloudinary = getCloudinaryId(req.user?.coverImage);
+
+  // Delete from Cloudinary
+  const coverImageDeletion = await deleteFromCloudinary(
+    coverImageIdOfCloudinary,
+    'image'
+  );
+
+  // Handle potential errors from Cloudinary deletions
+  if (
+    coverImageDeletion.deleted[coverImageIdOfCloudinary] === 'not_found' ||
+    coverImageDeletion.error
+  ) {
+    throw new ApiError(500, 'Error Deleting Cover Image from Cloudinary');
   }
 
   const user = await User.findByIdAndUpdate(

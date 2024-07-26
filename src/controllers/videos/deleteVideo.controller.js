@@ -19,7 +19,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
   const video = await Video.findById(videoId).populate('owner', 'fullName');
 
   if (!video) {
-    throw new ApiError(404, 'Video is not Existed.');
+    throw new ApiError(404, 'Video not Found.');
   }
 
   if (video.owner._id.toString() !== req.user._id.toString()) {

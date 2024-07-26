@@ -27,47 +27,12 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 };
 
-// ===================================================================
-
-const deleteVideoFromCloudinary = async (videoId) => {
-  try {
-    const response = await cloudinary.api.delete_resources([videoId], {
-      type: 'upload',
-      resource_type: 'video',
-    });
-
-    return response;
-  } catch (error) {
-    console.log('🚀 ~ deleteVideoFromCloudinary ~ error:', error);
-
-    throw new Error('Failed to delete video from Cloudinary');
-  }
-};
-
-const deleteImageFromCloudinary = async (imageId) => {
-  try {
-    const response = await cloudinary.api.delete_resources([imageId], {
-      type: 'upload',
-      resource_type: 'image',
-    });
-
-    return response;
-  } catch (error) {
-    console.log('🚀 ~ deleteImageFromCloudinary ~ error:', error);
-
-    throw new Error('Failed to delete image from Cloudinary');
-  }
-};
-
-// ===================================================================
-
 const deleteFromCloudinary = async (contentId, contentType) => {
   try {
     // delete the file from cloudinary
     const response = await cloudinary.api.delete_resources([contentId], {
       type: 'upload',
-      resource_type: 'auto',
-      // resource_type: contentType,
+      resource_type: contentType,
     });
 
     return response;
@@ -80,6 +45,8 @@ const deleteFromCloudinary = async (contentId, contentType) => {
 
 // get the cloudinary id of content from url
 const getCloudinaryId = (contentUrl) => {
+  if (!contentUrl) return '';
+
   return contentUrl
     .split('/')
     .pop()
@@ -88,8 +55,6 @@ const getCloudinaryId = (contentUrl) => {
 
 module.exports = {
   uploadOnCloudinary,
-  deleteVideoFromCloudinary,
-  deleteImageFromCloudinary,
   deleteFromCloudinary,
   getCloudinaryId,
 };
