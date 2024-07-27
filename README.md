@@ -17,7 +17,6 @@
   - [Dashboard](#dashboard)
   - [Tweet](#tweet)
 - [Environment Variables](#environment-variables)
-- [License](#license)
 
 ## Features
 
@@ -70,7 +69,9 @@
 - **Manage Tweets**: Users can update or delete their own tweets.
 - **Retrieve User Tweets**: Get all tweets posted by a specific user.
 
-## Installation
+## Installation and Running the Server
+
+### Running Normally
 
 1. Clone the repository:
 
@@ -91,6 +92,16 @@
 
    ```bash
    npm start
+   ```
+
+### Running with Docker
+
+1. Ensure you have Docker installed on your machine.
+
+2. Start the server:
+
+   ```bash
+   docker-compose up -d
    ```
 
 ## Usage

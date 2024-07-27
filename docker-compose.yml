@@ -28,6 +28,18 @@ services:
     depends_on:
       - mongodb
 
+  # Main Application
+  main-app:
+    build: .
+    container_name: main-app
+    restart: always
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongodb
+    env_file:
+      - .env
+
 volumes:
   my_mongodb_data:
     driver: local
