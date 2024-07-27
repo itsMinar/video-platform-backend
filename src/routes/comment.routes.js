@@ -14,7 +14,7 @@ router.route('/:videoId').get(getVideoComments);
 router.route('/:videoId').post(verifyJWT, addComment);
 router
   .route('/c/:commentId')
-  .delete(verifyJWT, deleteComment)
-  .patch(verifyJWT, updateComment);
+  .patch(verifyJWT, updateComment)
+  .delete(verifyJWT, deleteComment);
 
 module.exports = router;
