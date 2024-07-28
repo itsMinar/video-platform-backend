@@ -43,4 +43,3 @@ services:
 volumes:
   my_mongodb_data:
     driver: local
-# docker-compose up -d

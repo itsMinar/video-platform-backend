@@ -20,7 +20,7 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 // routes import
-const healthCheckRouter = require('../routes/healthCheck.routes.js');
+const healthCheckRouter = require('../routes/healthcheck.routes.js');
 const userRouter = require('../routes/user.routes.js');
 const videoRouter = require('../routes/video.routes.js');
 const subscriptionRouter = require('../routes/subscription.routes.js');

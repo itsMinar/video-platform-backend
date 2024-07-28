@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Features](#features)
-- [Installation](#installation)
+- [Installation and Running the Server](#installation-and-running-the-server)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
   - [User](#user)
@@ -71,14 +71,21 @@
 
 ## Installation and Running the Server
 
-### Running Normally
-
-1. Clone the repository:
+1. Clone the project repository:
 
    ```bash
    git clone https://github.com/itsMinar/video-platform-backend.git
+   ```
+
+2. Navigate to the project directory.
+
+   ```bash
    cd video-platform-backend
    ```
+
+### Run Normally
+
+1. Ensure you have [NodeJs](https://www.nodejs.org/), [MongoDB](https://www.mongodb.com) and [MongoDB Compass (optional)](https://www.mongodb.com/products/compass) installed on your machine.
 
 2. Install dependencies:
 
@@ -94,9 +101,9 @@
    npm start
    ```
 
-### Running with Docker
+### Run with Docker
 
-1. Ensure you have Docker installed on your machine.
+1. Ensure you have [Docker](https://www.docker.com) installed on your machine.
 
 2. Start the server:
 
@@ -186,7 +193,7 @@ Create a `.env` file in the root directory and add the following variables:
 PORT=8000
 CORS_ORIGIN=*
 
-MONGODB_URI=mongodb+srv://your-username:your-password@cluster0.qciljrp.mongodb.net
+MONGODB_URI=your-mongodb-url-connection-string
 
 ACCESS_TOKEN_SECRET=your-jwt-secret
 ACCESS_TOKEN_EXPIRY=1d
