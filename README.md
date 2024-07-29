@@ -83,6 +83,8 @@
    cd video-platform-backend
    ```
 
+3. Set up environment variables (see [Environment Variables](#environment-variables)).
+
 ### Run Normally
 
 1. Ensure you have [NodeJs](https://www.nodejs.org/), [MongoDB](https://www.mongodb.com) and [MongoDB Compass (optional)](https://www.mongodb.com/products/compass) installed on your machine.
@@ -93,9 +95,7 @@
    npm install
    ```
 
-3. Set up environment variables (see [Environment Variables](#environment-variables)).
-
-4. Start the server:
+3. Start the server:
 
    ```bash
    npm start
