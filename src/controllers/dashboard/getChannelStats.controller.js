@@ -52,11 +52,6 @@ const getChannelStats = asyncHandler(async (req, res) => {
             },
           },
           {
-            $sort: {
-              views: -1,
-            },
-          },
-          {
             $project: {
               title: 1,
               description: 1,
@@ -76,11 +71,20 @@ const getChannelStats = asyncHandler(async (req, res) => {
         totalSubscribers: {
           $size: '$subscriber_list',
         },
-        highest_viewed_video: {
-          $arrayElemAt: ['$video_list', 0],
-        },
         totalVideos: {
           $size: '$video_list',
+        },
+        highest_viewed_video: {
+          $arrayElemAt: [
+            {
+              $filter: {
+                input: '$video_list',
+                as: 'video',
+                cond: { $eq: ['$$video.views', { $max: '$video_list.views' }] },
+              },
+            },
+            0,
+          ],
         },
       },
     },
@@ -105,7 +109,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
         totalVideos: {
           $first: '$totalVideos',
         },
-        highest_viewed_video: {
+        highestViewedVideo: {
           $first: '$highest_viewed_video',
         },
         totalViews: {
