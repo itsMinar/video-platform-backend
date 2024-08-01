@@ -1,12 +1,11 @@
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { ApiError } = require('../../utils/ApiError');
-const { isValidObjectId } = require('mongoose');
+const { isValidObjectId, Types } = require('mongoose');
 const { User } = require('../../models/user.model');
 const { Tweet } = require('../../models/tweet.model');
 
 const getUserTweets = asyncHandler(async (req, res) => {
-  // TODO: aro onek kaj baki ache, bivinno query add korte hobe
   const { userId } = req.params;
 
   // check valid userId
@@ -20,7 +19,43 @@ const getUserTweets = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'User not found!');
   }
 
-  const allTweets = await Tweet.find({ owner: userId });
+  const allTweets = await Tweet.aggregate([
+    {
+      $match: {
+        owner: new Types.ObjectId(userId),
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'owner',
+        foreignField: '_id',
+        as: 'ownerInfo',
+        pipeline: [
+          {
+            $project: {
+              fullName: 1,
+              username: 1,
+              avatar: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        ownerInfo: {
+          $arrayElemAt: ['$ownerInfo', 0],
+        },
+      },
+    },
+    {
+      $project: {
+        content: 1,
+        ownerInfo: 1,
+      },
+    },
+  ]);
 
   // return response
   return res
