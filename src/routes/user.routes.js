@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const { upload } = require('../middlewares/multer.middleware.js');
 const { verifyJWT } = require('../middlewares/auth.middleware.js');
 const {
@@ -15,6 +14,9 @@ const {
   getWatchHistory,
 } = require('../controllers/users');
 
+const router = require('express').Router();
+
+// public routes
 router.route('/register').post(
   upload.fields([
     {
@@ -28,7 +30,6 @@ router.route('/register').post(
   ]),
   registerUser
 );
-
 router.route('/login').post(loginUser);
 
 // secured routes

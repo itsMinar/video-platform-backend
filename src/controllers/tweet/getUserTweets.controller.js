@@ -44,9 +44,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        ownerInfo: {
-          $arrayElemAt: ['$ownerInfo', 0],
-        },
+        ownerInfo: { $arrayElemAt: ['$ownerInfo', 0] },
       },
     },
     {

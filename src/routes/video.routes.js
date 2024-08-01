@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const { upload } = require('../middlewares/multer.middleware.js');
 const { verifyJWT } = require('../middlewares/auth.middleware.js');
 const {
@@ -8,6 +7,8 @@ const {
   updateVideo,
   deleteVideo,
 } = require('../controllers/videos');
+
+const router = require('express').Router();
 
 // public routes
 router.route('/').get(getAllVideos);

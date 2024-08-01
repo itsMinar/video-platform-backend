@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const { verifyJWT } = require('../middlewares/auth.middleware.js');
 const {
   createPlaylist,
@@ -9,6 +8,8 @@ const {
   removeVideoFromPlaylist,
   getUserPlaylists,
 } = require('../controllers/playlists');
+
+const router = require('express').Router();
 
 // Apply verifyJWT middleware to all routes in this file
 router.use(verifyJWT);

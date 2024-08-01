@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const { verifyJWT } = require('../middlewares/auth.middleware.js');
 const {
   toggleVideoLike,
@@ -6,6 +5,8 @@ const {
   toggleTweetLike,
   getLikedVideos,
 } = require('../controllers/likes');
+
+const router = require('express').Router();
 
 // Apply verifyJWT middleware to all routes in this file
 router.use(verifyJWT);

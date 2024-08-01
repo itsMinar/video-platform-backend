@@ -43,12 +43,8 @@ const getChannelStats = asyncHandler(async (req, res) => {
           },
           {
             $addFields: {
-              commentCount: {
-                $size: '$comment_list',
-              },
-              likeCount: {
-                $size: '$like_list',
-              },
+              commentCount: { $size: '$comment_list' },
+              likeCount: { $size: '$like_list' },
             },
           },
           {
@@ -68,12 +64,8 @@ const getChannelStats = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        totalSubscribers: {
-          $size: '$subscriber_list',
-        },
-        totalVideos: {
-          $size: '$video_list',
-        },
+        totalSubscribers: { $size: '$subscriber_list' },
+        totalVideos: { $size: '$video_list' },
         highest_viewed_video: {
           $arrayElemAt: [
             {
@@ -94,33 +86,15 @@ const getChannelStats = asyncHandler(async (req, res) => {
     {
       $group: {
         _id: '$_id',
-        username: {
-          $first: '$username',
-        },
-        fullName: {
-          $first: '$fullName',
-        },
-        avatar: {
-          $first: '$avatar',
-        },
-        totalSubscribers: {
-          $first: '$totalSubscribers',
-        },
-        totalVideos: {
-          $first: '$totalVideos',
-        },
-        highestViewedVideo: {
-          $first: '$highest_viewed_video',
-        },
-        totalViews: {
-          $sum: '$video_list.views',
-        },
-        totalLikes: {
-          $sum: '$video_list.likeCount',
-        },
-        totalComments: {
-          $sum: '$video_list.commentCount',
-        },
+        username: { $first: '$username' },
+        fullName: { $first: '$fullName' },
+        avatar: { $first: '$avatar' },
+        totalSubscribers: { $first: '$totalSubscribers' },
+        totalVideos: { $first: '$totalVideos' },
+        highestViewedVideo: { $first: '$highest_viewed_video' },
+        totalViews: { $sum: '$video_list.views' },
+        totalLikes: { $sum: '$video_list.likeCount' },
+        totalComments: { $sum: '$video_list.commentCount' },
       },
     },
   ]);

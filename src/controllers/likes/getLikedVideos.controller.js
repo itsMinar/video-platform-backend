@@ -38,9 +38,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
           },
           {
             $addFields: {
-              ownerInfo: {
-                $arrayElemAt: ['$ownerInfo', 0],
-              },
+              ownerInfo: { $arrayElemAt: ['$ownerInfo', 0] },
             },
           },
           {
@@ -58,9 +56,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        videoDetails: {
-          $arrayElemAt: ['$videoDetails', 0],
-        },
+        videoDetails: { $arrayElemAt: ['$videoDetails', 0] },
       },
     },
     {

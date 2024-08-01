@@ -35,12 +35,8 @@ const getChannelVideos = asyncHandler(async (req, res) => {
           },
           {
             $addFields: {
-              totalComments: {
-                $size: '$comment_list',
-              },
-              totalLikes: {
-                $size: '$like_list',
-              },
+              totalComments: { $size: '$comment_list' },
+              totalLikes: { $size: '$like_list' },
             },
           },
           {
@@ -60,9 +56,7 @@ const getChannelVideos = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        totalVideos: {
-          $size: '$video_list',
-        },
+        totalVideos: { $size: '$video_list' },
       },
     },
     {

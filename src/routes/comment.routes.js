@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const { verifyJWT } = require('../middlewares/auth.middleware.js');
 const {
   getVideoComments,
@@ -6,6 +5,8 @@ const {
   updateComment,
   deleteComment,
 } = require('../controllers/comments');
+
+const router = require('express').Router();
 
 // public routes
 router.route('/:videoId').get(getVideoComments);
