@@ -10,9 +10,9 @@ const deleteComment = asyncHandler(async (req, res, next) => {
   // check valid commentId
   if (!isValidObjectId(commentId)) {
     const error = CustomError.badRequest({
-      message: 'Invalid Comment ID',
-      errors: ['The provided Comment ID is not valid.'],
-      hints: 'Please ensure that the Comment ID is correct and try again.',
+      message: 'Validation Error',
+      errors: ['Invalid Comment ID'],
+      hints: 'Please ensure that the Comment ID is valid and try again',
     });
 
     return next(error);
@@ -25,7 +25,7 @@ const deleteComment = asyncHandler(async (req, res, next) => {
     const error = CustomError.notFound({
       message: 'Comment not found!',
       errors: ['The specified comment could not be located.'],
-      hints: 'Please verify the comment ID and try again.',
+      hints: 'Please verify the comment ID and try again',
     });
 
     return next(error);

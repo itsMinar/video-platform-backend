@@ -37,8 +37,6 @@ const createPlaylist = asyncHandler(async (req, res, next) => {
     const error = CustomError.serverError({
       message: 'Something went wrong while creating the playlist',
       errors: ['An error occurred during the playlist creation process.'],
-      hints:
-        'Please try again later. If the problem persists, contact support.',
     });
 
     return next(error);
@@ -48,7 +46,7 @@ const createPlaylist = asyncHandler(async (req, res, next) => {
   return res
     .status(201)
     .json(
-      new ApiResponse(200, createdPlaylist, 'Playlist Created Successfully')
+      new ApiResponse(201, createdPlaylist, 'Playlist Created Successfully')
     );
 });
 

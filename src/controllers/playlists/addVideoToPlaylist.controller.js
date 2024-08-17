@@ -9,10 +9,10 @@ const addVideoToPlaylist = asyncHandler(async (req, res, next) => {
 
   // Check valid videoId and playlistId
   if (!isValidObjectId(videoId) || !isValidObjectId(playlistId)) {
-    const error = CustomError.notFound({
-      message: 'Invalid Video or Playlist ID',
-      errors: ['The specified Video ID or Playlist ID does not valid.'],
-      hints: 'Please check the Video ID or Playlist ID and try again.',
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: ['Invalid Video or Playlist ID'],
+      hints: 'Please check the Video ID or Playlist ID and try again',
     });
 
     return next(error);
@@ -25,7 +25,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res, next) => {
     const error = CustomError.notFound({
       message: 'Playlist not found!',
       errors: ['The specified playlist could not be found.'],
-      hints: 'Please check the playlist ID and try again.',
+      hints: 'Please check the playlist ID and try again',
     });
 
     return next(error);
@@ -40,8 +40,6 @@ const addVideoToPlaylist = asyncHandler(async (req, res, next) => {
           errors: [
             'The video you are trying to add is already present in the specified playlist.',
           ],
-          hints:
-            'Please check the playlist contents or try adding a different video.',
         });
 
         return next(error);
@@ -56,9 +54,9 @@ const addVideoToPlaylist = asyncHandler(async (req, res, next) => {
 
   // return response
   return res
-    .status(201)
+    .status(200)
     .json(
-      new ApiResponse(201, playlist, 'Video Added to the Playlist Successfully')
+      new ApiResponse(200, playlist, 'Video Added to the Playlist Successfully')
     );
 });
 

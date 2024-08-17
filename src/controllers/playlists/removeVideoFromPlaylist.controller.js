@@ -12,7 +12,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Validation Error',
       errors: ['Invalid Video or Playlist ID'],
-      hints: 'Please check the Video ID or Playlist ID and try again.',
+      hints: 'Please check the Video ID or Playlist ID and try again',
     });
 
     return next(error);
@@ -29,7 +29,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res, next) => {
     const error = CustomError.notFound({
       message: 'Playlist not found!',
       errors: ['The specified playlist could not be found.'],
-      hints: 'Please check the playlist ID and try again.',
+      hints: 'Please check the playlist ID and try again',
     });
 
     return next(error);

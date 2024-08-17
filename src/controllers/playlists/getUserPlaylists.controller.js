@@ -12,7 +12,7 @@ const getUserPlaylists = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Validation Error',
       errors: ['Invalid User ID'],
-      hints: 'Please check the User ID and try again.',
+      hints: 'Please check the User ID and try again',
     });
 
     return next(error);
@@ -25,7 +25,7 @@ const getUserPlaylists = asyncHandler(async (req, res, next) => {
     const error = CustomError.notFound({
       message: 'This user has no Playlist',
       errors: ['The specified user does not have any playlists.'],
-      hints: 'Please check the user playlist and try again later.',
+      hints: 'Please check the user playlist and try again later',
     });
 
     return next(error);
@@ -33,10 +33,10 @@ const getUserPlaylists = asyncHandler(async (req, res, next) => {
 
   // return response
   return res
-    .status(201)
+    .status(200)
     .json(
       new ApiResponse(
-        201,
+        200,
         playlist,
         'All Playlist of User fetched Successfully'
       )

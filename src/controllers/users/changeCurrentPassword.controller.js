@@ -48,7 +48,7 @@ const changeCurrentPassword = asyncHandler(async (req, res, next) => {
   // return a Response
   return res
     .status(200)
-    .json(new ApiResponse(200, {}, 'Password Changed Successfully'));
+    .json(new ApiResponse(200, null, 'Password Changed Successfully'));
 });
 
 module.exports = changeCurrentPassword;

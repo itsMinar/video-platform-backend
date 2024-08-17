@@ -9,10 +9,10 @@ const toggleTweetLike = asyncHandler(async (req, res, next) => {
 
   // check valid tweetId
   if (!isValidObjectId(tweetId)) {
-    const error = CustomError.notFound({
-      message: 'Invalid Tweet ID',
-      errors: ['The specified Tweet ID does not match any records.'],
-      hints: 'Please check the Tweet ID and try again.',
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: ['Invalid Tweet ID'],
+      hints: 'Please check the Tweet ID and try again',
     });
 
     return next(error);
@@ -46,7 +46,6 @@ const toggleTweetLike = asyncHandler(async (req, res, next) => {
       errors: [
         'The system encountered an issue while processing your like request.',
       ],
-      hints: 'Please try again later',
     });
 
     return next(error);

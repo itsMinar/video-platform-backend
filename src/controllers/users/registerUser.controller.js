@@ -44,7 +44,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
       message: 'Resource Conflict',
       errors: ['User with email or username already exists'],
       hints:
-        'Ensure the resource you are trying to create does not already exist.',
+        'Ensure the resource you are trying to create does not already exist',
     });
 
     return next(error);
@@ -66,7 +66,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Validation Error',
       errors: ['Avatar file is required'],
-      hints: 'Please provide the avatar file.',
+      hints: 'Please provide the avatar file',
     });
 
     return next(error);
@@ -80,7 +80,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Validation Error',
       errors: ['Avatar file is required'],
-      hints: 'Please provide the avatar file.',
+      hints: 'Please provide the avatar file',
     });
 
     return next(error);
@@ -103,7 +103,6 @@ const registerUser = asyncHandler(async (req, res, next) => {
     const error = CustomError.serverError({
       message: 'Something went wrong while registering the user',
       errors: ['User creation failed. Please try again later.'],
-      hints: 'If the problem persists, please contact our support team.',
     });
 
     return next(error);

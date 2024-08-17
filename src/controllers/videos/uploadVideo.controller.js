@@ -41,7 +41,7 @@ const uploadVideo = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Video file is required',
       errors: ['No video file was provided in the request.'],
-      hints: 'Please upload a video file and try again.',
+      hints: 'Please upload a video file and try again',
     });
 
     return next(error);
@@ -51,7 +51,7 @@ const uploadVideo = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Video Thumbnail is required',
       errors: ['No video thumbnail was provided in the request.'],
-      hints: 'Please upload a video thumbnail and try again.',
+      hints: 'Please upload a video thumbnail and try again',
     });
 
     return next(error);
@@ -68,7 +68,7 @@ const uploadVideo = asyncHandler(async (req, res, next) => {
         'Both a video file and a thumbnail are required in the request.',
       ],
       hints:
-        'Please ensure that both the video file and the thumbnail are provided and try again.',
+        'Please ensure that both the video file and the thumbnail are provided and try again',
     });
 
     return next(error);
@@ -90,7 +90,6 @@ const uploadVideo = asyncHandler(async (req, res, next) => {
     const error = CustomError.serverError({
       message: 'Something went wrong while uploading the video',
       errors: ['An error occurred during the video upload process.'],
-      hints: 'Please try again later. If the issue persists, contact support.',
     });
 
     return next(error);
@@ -99,7 +98,7 @@ const uploadVideo = asyncHandler(async (req, res, next) => {
   // return response
   return res
     .status(201)
-    .json(new ApiResponse(200, createdVideo, 'Video Uploaded Successfully'));
+    .json(new ApiResponse(201, createdVideo, 'Video Uploaded Successfully'));
 });
 
 module.exports = uploadVideo;

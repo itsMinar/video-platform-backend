@@ -66,7 +66,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
     const error = CustomError.unauthorized({
       message: 'Invalid user credentials',
       errors: ['The provided email/username or password is incorrect.'],
-      hints: 'Please check your credentials and try again.',
+      hints: 'Please check your credentials and try again',
     });
 
     return next(error);

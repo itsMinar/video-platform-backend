@@ -37,7 +37,7 @@ const addComment = asyncHandler(async (req, res, next) => {
     const error = CustomError.notFound({
       message: 'Video not found!',
       errors: ['The video associated with this comment does not exist.'],
-      hints: 'Please ensure that the video ID is correct and try again.',
+      hints: 'Please ensure that the video ID is correct and try again',
     });
 
     return next(error);

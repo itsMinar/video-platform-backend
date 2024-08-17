@@ -10,7 +10,7 @@ const getUserChannelProfile = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Username is missing',
       errors: ['The username field is required and was not provided.'],
-      hints: 'Please include a username and try again.',
+      hints: 'Please include a username and try again',
     });
 
     return next(error);

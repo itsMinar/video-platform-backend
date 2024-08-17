@@ -37,8 +37,6 @@ const createTweet = asyncHandler(async (req, res, next) => {
     const error = CustomError.serverError({
       message: 'Something went wrong while creating the tweet',
       errors: ['An error occurred during the tweet creation process.'],
-      hints:
-        'Please try again later. If the problem persists, contact support.',
     });
 
     return next(error);

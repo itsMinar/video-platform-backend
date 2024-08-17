@@ -1,7 +1,7 @@
 const { z } = require('zod');
+const { isValidObjectId } = require('mongoose');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { ApiResponse } = require('../../utils/ApiResponse');
-const { isValidObjectId } = require('mongoose');
 const { Tweet } = require('../../models/tweet.model');
 const CustomError = require('../../utils/Error');
 
@@ -43,7 +43,7 @@ const updateTweet = asyncHandler(async (req, res, next) => {
     const error = CustomError.notFound({
       message: 'Tweet not found',
       errors: ['The specified tweet could not be found.'],
-      hints: 'Please check the tweet ID and try again.',
+      hints: 'Please check the tweet ID and try again',
     });
 
     return next(error);

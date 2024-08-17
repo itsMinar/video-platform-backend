@@ -44,7 +44,7 @@ const updatePlaylist = asyncHandler(async (req, res, next) => {
     const error = CustomError.notFound({
       message: 'Playlist not found!',
       errors: ['The specified playlist could not be found.'],
-      hints: 'Please check the playlist ID and try again.',
+      hints: 'Please check the playlist ID and try again',
     });
 
     return next(error);
@@ -52,7 +52,7 @@ const updatePlaylist = asyncHandler(async (req, res, next) => {
 
   // return response
   return res
-    .status(201)
+    .status(200)
     .json(
       new ApiResponse(200, updatedPlaylist, 'Playlist Updated Successfully')
     );

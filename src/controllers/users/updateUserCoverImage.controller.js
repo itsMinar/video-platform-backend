@@ -15,7 +15,7 @@ const updateUserCoverImage = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Cover image is required',
       errors: ['No cover image was provided in the request.'],
-      hints: 'Please upload a cover image and try again.',
+      hints: 'Please upload a cover image and try again',
     });
 
     return next(error);

@@ -16,7 +16,7 @@ const deleteVideo = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Validation Error',
       errors: ['Invalid Video ID'],
-      hints: 'Please check the Video ID and try again.',
+      hints: 'Please check the Video ID and try again',
     });
 
     return next(error);
@@ -28,7 +28,7 @@ const deleteVideo = asyncHandler(async (req, res, next) => {
     const error = CustomError.notFound({
       message: 'Video not found',
       errors: ['The specified video could not be found.'],
-      hints: 'Please check the video ID and try again.',
+      hints: 'Please check the video ID and try again',
     });
 
     return next(error);
@@ -38,7 +38,7 @@ const deleteVideo = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'You cannot delete this video!',
       errors: ['The video you are trying to delete does not belong to you.'],
-      hints: 'Please check the video ownership and try again.',
+      hints: 'Please check the video ownership and try again',
     });
 
     return next(error);
@@ -66,7 +66,6 @@ const deleteVideo = asyncHandler(async (req, res, next) => {
       errors: [
         'An error occurred while trying to delete the video from Cloudinary.',
       ],
-      hints: 'Please try again later. If the issue persists, contact support.',
     });
 
     return next(error);

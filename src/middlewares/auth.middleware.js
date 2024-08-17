@@ -13,7 +13,7 @@ const verifyJWT = asyncHandler(async (req, _res, next) => {
       const error = CustomError.unauthorized({
         message: 'Unauthorized request',
         errors: ['Token is required for authentication'],
-        hints: 'Please provide a valid token to access this resource.',
+        hints: 'Please provide a valid token to access this resource',
       });
 
       return next(error);
@@ -29,7 +29,7 @@ const verifyJWT = asyncHandler(async (req, _res, next) => {
       const error = CustomError.unauthorized({
         message: 'Invalid Access Token',
         errors: ['The provided access token is invalid or has expired'],
-        hints: 'Please provide a valid access token and try again.',
+        hints: 'Please provide a valid access token and try again',
       });
 
       return next(error);
@@ -44,7 +44,7 @@ const verifyJWT = asyncHandler(async (req, _res, next) => {
       errors: [
         err?.message || 'The provided access token is invalid or has expired',
       ],
-      hints: 'Please provide a valid access token and try again.',
+      hints: 'Please provide a valid access token and try again',
     });
 
     return next(error);

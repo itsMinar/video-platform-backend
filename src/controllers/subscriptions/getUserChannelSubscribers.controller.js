@@ -12,7 +12,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Validation Error',
       errors: ['Invalid Channel ID'],
-      hints: 'Please check the Channel ID and try again.',
+      hints: 'Please check the Channel ID and try again',
     });
 
     return next(error);

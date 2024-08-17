@@ -9,10 +9,10 @@ const toggleVideoLike = asyncHandler(async (req, res, next) => {
 
   // check valid videoId
   if (!isValidObjectId(videoId)) {
-    const error = CustomError.notFound({
-      message: 'Invalid Video ID',
-      errors: ['The specified Video ID does not match any records.'],
-      hints: 'Please check the Video ID and try again.',
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: ['Invalid Video ID'],
+      hints: 'Please check the Video ID and try again',
     });
 
     return next(error);
@@ -46,7 +46,6 @@ const toggleVideoLike = asyncHandler(async (req, res, next) => {
       errors: [
         'The system encountered an issue while processing your like request.',
       ],
-      hints: 'Please try again later',
     });
 
     return next(error);

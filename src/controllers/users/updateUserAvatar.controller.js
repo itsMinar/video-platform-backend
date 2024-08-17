@@ -15,7 +15,7 @@ const updateUserAvatar = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Avatar is required',
       errors: ['No avatar was provided in the request.'],
-      hints: 'Please upload a avatar and try again.',
+      hints: 'Please upload a avatar and try again',
     });
 
     return next(error);

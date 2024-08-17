@@ -1,6 +1,6 @@
+const jwt = require('jsonwebtoken');
 const { User } = require('../../models/user.model');
 const { asyncHandler } = require('../../utils/asyncHandler');
-const jwt = require('jsonwebtoken');
 const generateAccessAndrefreshTokens = require('../../services/generateAccessAndrefreshTokens');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const CustomError = require('../../utils/Error');
@@ -13,7 +13,7 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
     const error = CustomError.unauthorized({
       message: 'Unauthorized request',
       errors: ['Refresh token is missing or invalid.'],
-      hints: 'Please provide a valid refresh token and try again.',
+      hints: 'Please provide a valid refresh token and try again',
     });
 
     return next(error);
@@ -44,7 +44,7 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
           'The provided refresh token is either expired or has already been used.',
         ],
         hints:
-          'Please provide a valid refresh token or obtain a new one and try again.',
+          'Please provide a valid refresh token or obtain a new one and try again',
       });
 
       return next(error);

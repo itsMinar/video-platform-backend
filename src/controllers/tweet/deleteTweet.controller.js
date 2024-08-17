@@ -1,6 +1,6 @@
+const { isValidObjectId } = require('mongoose');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { ApiResponse } = require('../../utils/ApiResponse');
-const { isValidObjectId } = require('mongoose');
 const { Tweet } = require('../../models/tweet.model');
 const CustomError = require('../../utils/Error');
 
@@ -12,7 +12,7 @@ const deleteTweet = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Validation Error',
       errors: ['Invalid Tweet ID'],
-      hints: 'Please check the Tweet ID and try again.',
+      hints: 'Please check the Tweet ID and try again',
     });
 
     return next(error);
@@ -25,7 +25,7 @@ const deleteTweet = asyncHandler(async (req, res, next) => {
     const error = CustomError.notFound({
       message: 'Tweet not found',
       errors: ['The specified tweet could not be found.'],
-      hints: 'Please check the tweet ID and try again.',
+      hints: 'Please check the tweet ID and try again',
     });
 
     return next(error);

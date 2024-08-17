@@ -40,7 +40,7 @@ const updateVideo = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'You cannot Update this video!',
       errors: ['The video you are trying to Update does not belong to you.'],
-      hints: 'Please check the video ownership and try again.',
+      hints: 'Please check the video ownership and try again',
     });
 
     return next(error);
@@ -52,7 +52,7 @@ const updateVideo = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Video Thumbnail is required',
       errors: ['No video thumbnail was provided in the request.'],
-      hints: 'Please upload a video thumbnail and try again.',
+      hints: 'Please upload a video thumbnail and try again',
     });
 
     return next(error);
@@ -65,7 +65,6 @@ const updateVideo = asyncHandler(async (req, res, next) => {
     const error = CustomError.serverError({
       message: 'Error while uploading the Video Thumbnail',
       errors: ['An error occurred during the video thumbnail upload process.'],
-      hints: 'Please try again later',
     });
 
     return next(error);

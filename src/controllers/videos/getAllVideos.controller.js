@@ -17,7 +17,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
   const skip = (pageInt - 1) * limitInt;
 
   // Create a filter object for aggregation
-  let match = {};
+  let match = { isPublished: true };
   if (query) {
     match = { ...match, title: { $regex: query, $options: 'i' } };
   }

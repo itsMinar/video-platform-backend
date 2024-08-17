@@ -1,6 +1,6 @@
+const { isValidObjectId, Types } = require('mongoose');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { ApiResponse } = require('../../utils/ApiResponse');
-const { isValidObjectId, Types } = require('mongoose');
 const { User } = require('../../models/user.model');
 const { Tweet } = require('../../models/tweet.model');
 const CustomError = require('../../utils/Error');
@@ -13,7 +13,7 @@ const getUserTweets = asyncHandler(async (req, res, next) => {
     const error = CustomError.badRequest({
       message: 'Validation Error',
       errors: ['Invalid User ID'],
-      hints: 'Please check the User ID and try again.',
+      hints: 'Please check the User ID and try again',
     });
 
     return next(error);
@@ -25,7 +25,7 @@ const getUserTweets = asyncHandler(async (req, res, next) => {
     const error = CustomError.notFound({
       message: 'User not found',
       errors: ['The specified user could not be found.'],
-      hints: 'Please check the user ID and try again.',
+      hints: 'Please check the user ID and try again',
     });
 
     return next(error);

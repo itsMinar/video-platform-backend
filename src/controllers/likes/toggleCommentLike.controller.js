@@ -9,10 +9,10 @@ const toggleCommentLike = asyncHandler(async (req, res, next) => {
 
   // check valid commentId
   if (!isValidObjectId(commentId)) {
-    const error = CustomError.notFound({
-      message: 'Invalid Comment ID',
-      errors: ['The specified Comment ID does not match any records.'],
-      hints: 'Please check the Comment ID and try again.',
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: ['Invalid Comment ID'],
+      hints: 'Please check the Comment ID and try again',
     });
 
     return next(error);
@@ -46,7 +46,6 @@ const toggleCommentLike = asyncHandler(async (req, res, next) => {
       errors: [
         'The system encountered an issue while processing your like request.',
       ],
-      hints: 'Please try again later',
     });
 
     return next(error);

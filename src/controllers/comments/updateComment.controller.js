@@ -1,9 +1,9 @@
+const { z } = require('zod');
 const { isValidObjectId } = require('mongoose');
 const { Comment } = require('../../models/comment.model');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const CustomError = require('../../utils/Error');
-const { z } = require('zod');
 
 const updateComment = asyncHandler(async (req, res, next) => {
   const { commentId } = req.params;
@@ -41,7 +41,7 @@ const updateComment = asyncHandler(async (req, res, next) => {
     const error = CustomError.notFound({
       message: 'Comment not found!',
       errors: ['The specified comment could not be located.'],
-      hints: 'Please verify the comment ID and try again.',
+      hints: 'Please verify the comment ID and try again',
     });
 
     return next(error);
