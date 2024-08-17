@@ -1,40 +1,58 @@
+const { z } = require('zod');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { ApiResponse } = require('../../utils/ApiResponse');
-const { ApiError } = require('../../utils/ApiError');
 const { isValidObjectId } = require('mongoose');
 const { Tweet } = require('../../models/tweet.model');
+const CustomError = require('../../utils/Error');
 
-const updateTweet = asyncHandler(async (req, res) => {
+const updateTweet = asyncHandler(async (req, res, next) => {
   const { tweetId } = req.params;
-  const { content } = req.body;
 
-  // check valid tweetId
-  if (!isValidObjectId(tweetId)) {
-    throw new ApiError(404, 'Invalid Tweet ID');
-  }
+  const schema = z.object({
+    tweetId: z
+      .string({ message: 'Tweet ID is required' })
+      .refine((id) => isValidObjectId(id), {
+        message: 'Invalid Tweet ID',
+      }),
+    content: z
+      .string({ message: 'Tweet content is required' })
+      .min(1, 'Tweet content must be at least 1 character')
+      .optional(),
+  });
 
-  // validation - not empty
-  if (!content) {
-    throw new ApiError(400, 'All fields are required');
+  const validation = schema.safeParse({ ...req.body, tweetId });
+
+  if (!validation.success) {
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: validation.error.errors.map((err) => err.message),
+      hints: 'Please provide all the required fields',
+    });
+
+    return next(error);
   }
 
   // find tweet by the Tweet ID from DB
-  const tweet = await Tweet.findById(tweetId).select('content');
+  const updatedTweet = await Tweet.findByIdAndUpdate(
+    validation.data.tweetId,
+    validation.data,
+    { new: true }
+  );
 
-  if (!tweet) {
-    throw new ApiError(400, 'Tweet not found!');
+  if (!updatedTweet) {
+    const error = CustomError.notFound({
+      message: 'Tweet not found',
+      errors: ['The specified tweet could not be found.'],
+      hints: 'Please check the tweet ID and try again.',
+    });
+
+    return next(error);
   }
-
-  // update the tweet object
-  tweet.content = content;
-
-  // save new tweet to the DB
-  await tweet.save();
 
   // return response
   return res
     .status(200)
-    .json(new ApiResponse(200, tweet, 'Tweet Updated Successfully'));
+    .json(new ApiResponse(200, updatedTweet, 'Tweet Updated Successfully'));
 });
 
 module.exports = updateTweet;

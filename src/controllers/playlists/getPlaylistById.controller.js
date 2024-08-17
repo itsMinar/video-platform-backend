@@ -1,15 +1,21 @@
 const { isValidObjectId } = require('mongoose');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { Playlist } = require('../../models/playlist.model');
+const CustomError = require('../../utils/Error');
 
-const getPlaylistById = asyncHandler(async (req, res) => {
+const getPlaylistById = asyncHandler(async (req, res, next) => {
   const { playlistId } = req.params;
 
   // check valid playlistId
   if (!isValidObjectId(playlistId)) {
-    throw new ApiError(404, 'Invalid Playlist ID');
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: ['Invalid Playlist ID'],
+      hints: 'Please check the playlist ID and try again.',
+    });
+
+    return next(error);
   }
 
   // find the playlist
@@ -17,13 +23,19 @@ const getPlaylistById = asyncHandler(async (req, res) => {
 
   // check for playlist exist
   if (!playlist) {
-    throw new ApiError(404, 'Playlist not found.');
+    const error = CustomError.notFound({
+      message: 'Playlist not found!',
+      errors: ['The specified playlist could not be found.'],
+      hints: 'Please check the playlist ID and try again.',
+    });
+
+    return next(error);
   }
 
   // return response
   return res
-    .status(201)
-    .json(new ApiResponse(201, playlist, 'Playlist info Fetched Successfully'));
+    .status(200)
+    .json(new ApiResponse(200, playlist, 'Playlist info Fetched Successfully'));
 });
 
 module.exports = getPlaylistById;

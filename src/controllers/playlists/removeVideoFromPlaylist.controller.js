@@ -1,15 +1,21 @@
 const { isValidObjectId } = require('mongoose');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { Playlist } = require('../../models/playlist.model');
+const CustomError = require('../../utils/Error');
 
-const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
+const removeVideoFromPlaylist = asyncHandler(async (req, res, next) => {
   const { videoId, playlistId } = req.params;
 
   // Check valid videoId and playlistId
   if (!isValidObjectId(videoId) || !isValidObjectId(playlistId)) {
-    throw new ApiError(404, 'Invalid Video or Playlist ID');
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: ['Invalid Video or Playlist ID'],
+      hints: 'Please check the Video ID or Playlist ID and try again.',
+    });
+
+    return next(error);
   }
 
   // find the playlist and remove video from the list
@@ -20,7 +26,13 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
   );
 
   if (!updatedPlaylist) {
-    throw new ApiError(404, 'Playlist not found!');
+    const error = CustomError.notFound({
+      message: 'Playlist not found!',
+      errors: ['The specified playlist could not be found.'],
+      hints: 'Please check the playlist ID and try again.',
+    });
+
+    return next(error);
   }
 
   // return response

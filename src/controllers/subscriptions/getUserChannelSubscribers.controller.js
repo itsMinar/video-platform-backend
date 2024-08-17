@@ -1,15 +1,21 @@
 const { Types, isValidObjectId } = require('mongoose');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { ApiResponse } = require('../../utils/ApiResponse');
-const { ApiError } = require('../../utils/ApiError');
 const { Subscription } = require('../../models/subscription.model');
+const CustomError = require('../../utils/Error');
 
-const getUserChannelSubscribers = asyncHandler(async (req, res) => {
+const getUserChannelSubscribers = asyncHandler(async (req, res, next) => {
   const { channelId } = req.params;
 
   // check valid channelId
   if (!isValidObjectId(channelId)) {
-    throw new ApiError(404, 'Invalid Channel ID');
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: ['Invalid Channel ID'],
+      hints: 'Please check the Channel ID and try again.',
+    });
+
+    return next(error);
   }
 
   const subscriberList = await Subscription.aggregate([

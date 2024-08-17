@@ -1,5 +1,5 @@
 const { User } = require('../models/user.model');
-const { ApiError } = require('../utils/ApiError');
+const CustomError = require('../utils/Error');
 
 const generateAccessAndrefreshTokens = async (userId) => {
   try {
@@ -11,11 +11,14 @@ const generateAccessAndrefreshTokens = async (userId) => {
     await user.save({ validateBeforeSave: false });
 
     return { accessToken, refreshToken };
-  } catch (error) {
-    throw new ApiError(
-      500,
-      'Something went wrong while generating access and refresh token.'
-    );
+  } catch (err) {
+    const error = CustomError.serverError({
+      message:
+        'Something went wrong while generating access and refresh token.',
+      errors: ['Token generation failed due to an internal server error.'],
+    });
+
+    return next(error);
   }
 };
 

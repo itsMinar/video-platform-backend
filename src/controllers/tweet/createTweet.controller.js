@@ -1,19 +1,31 @@
+const { z } = require('zod');
 const { Tweet } = require('../../models/tweet.model');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
+const CustomError = require('../../utils/Error');
 
-const createTweet = asyncHandler(async (req, res) => {
-  const { content } = req.body;
+const createTweet = asyncHandler(async (req, res, next) => {
+  const schema = z.object({
+    content: z
+      .string({ message: 'Tweet content is required' })
+      .min(1, 'Tweet content must be at least 1 character'),
+  });
 
-  // validation - not empty
-  if (!content) {
-    throw new ApiError(400, 'All fields are required');
+  const validation = schema.safeParse(req.body);
+
+  if (!validation.success) {
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: validation.error.errors.map((err) => err.message),
+      hints: 'Please provide all the required fields',
+    });
+
+    return next(error);
   }
 
   // create tweet object - create entry in DB
   const tweet = await Tweet.create({
-    content,
+    content: validation.data.content,
     owner: req.user._id,
   });
 
@@ -22,7 +34,14 @@ const createTweet = asyncHandler(async (req, res) => {
 
   // check for user creation
   if (!createdTweet) {
-    throw new ApiError(500, 'Something went wrong while creating the tweet');
+    const error = CustomError.serverError({
+      message: 'Something went wrong while creating the tweet',
+      errors: ['An error occurred during the tweet creation process.'],
+      hints:
+        'Please try again later. If the problem persists, contact support.',
+    });
+
+    return next(error);
   }
 
   // return response

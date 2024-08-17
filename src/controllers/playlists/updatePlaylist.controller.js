@@ -1,41 +1,61 @@
+const { z } = require('zod');
 const { isValidObjectId } = require('mongoose');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { Playlist } = require('../../models/playlist.model');
+const CustomError = require('../../utils/Error');
 
-const updatePlaylist = asyncHandler(async (req, res) => {
-  const { name, description } = req.body;
+const updatePlaylist = asyncHandler(async (req, res, next) => {
   const { playlistId } = req.params;
 
-  // check valid playlistId
-  if (!isValidObjectId(playlistId)) {
-    throw new ApiError(404, 'Invalid Playlist ID');
+  const schema = z.object({
+    playlistId: z
+      .string({ message: 'Playlist ID is required' })
+      .refine((id) => isValidObjectId(id), {
+        message: 'Invalid Playlist ID',
+      }),
+    name: z.string({ message: 'Playlist name is required' }).optional(),
+    description: z
+      .string({ message: 'Playlist description is required' })
+      .min(2, 'Description must be at least 2 characters')
+      .optional(),
+  });
+
+  const validation = schema.safeParse({ playlistId, ...req.body });
+
+  if (!validation.success) {
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: validation.error.errors.map((err) => err.message),
+      hints: 'Please provide all the required fields',
+    });
+
+    return next(error);
   }
 
-  // validation - not empty
-  if ([name, description].some((field) => field?.trim() === '')) {
-    throw new ApiError(400, 'All fields are required');
-  }
-
-  const playlist = await Playlist.findById(playlistId);
+  const updatedPlaylist = await Playlist.findByIdAndUpdate(
+    validation.data.playlistId,
+    validation.data,
+    { new: true }
+  );
 
   // check for playlist exist
-  if (!playlist) {
-    throw new ApiError(404, 'Playlist not found.');
+  if (!updatedPlaylist) {
+    const error = CustomError.notFound({
+      message: 'Playlist not found!',
+      errors: ['The specified playlist could not be found.'],
+      hints: 'Please check the playlist ID and try again.',
+    });
+
+    return next(error);
   }
-
-  // update playlist info
-  playlist.name = name;
-  playlist.description = description;
-
-  // save new info to the DB
-  await playlist.save();
 
   // return response
   return res
     .status(201)
-    .json(new ApiResponse(200, playlist, 'Playlist Updated Successfully'));
+    .json(
+      new ApiResponse(200, updatedPlaylist, 'Playlist Updated Successfully')
+    );
 });
 
 module.exports = updatePlaylist;

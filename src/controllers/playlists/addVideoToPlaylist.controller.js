@@ -1,29 +1,50 @@
 const { isValidObjectId } = require('mongoose');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { Playlist } = require('../../models/playlist.model');
+const CustomError = require('../../utils/Error');
 
-const addVideoToPlaylist = asyncHandler(async (req, res) => {
+const addVideoToPlaylist = asyncHandler(async (req, res, next) => {
   const { videoId, playlistId } = req.params;
 
   // Check valid videoId and playlistId
   if (!isValidObjectId(videoId) || !isValidObjectId(playlistId)) {
-    throw new ApiError(404, 'Invalid Video or Playlist ID');
+    const error = CustomError.notFound({
+      message: 'Invalid Video or Playlist ID',
+      errors: ['The specified Video ID or Playlist ID does not valid.'],
+      hints: 'Please check the Video ID or Playlist ID and try again.',
+    });
+
+    return next(error);
   }
 
   // find the playlist
   const playlist = await Playlist.findById(playlistId);
 
   if (!playlist) {
-    throw new ApiError(400, 'Playlist not found!');
+    const error = CustomError.notFound({
+      message: 'Playlist not found!',
+      errors: ['The specified playlist could not be found.'],
+      hints: 'Please check the playlist ID and try again.',
+    });
+
+    return next(error);
   }
 
   // check that the video already added in the playlist
   playlist.videos.length > 0 &&
     playlist.videos.filter((video) => {
       if (video.toString() === videoId.toString()) {
-        throw new ApiError(404, 'This Video is already added in this playlist');
+        const error = CustomError.notFound({
+          message: 'This Video is already added in this playlist',
+          errors: [
+            'The video you are trying to add is already present in the specified playlist.',
+          ],
+          hints:
+            'Please check the playlist contents or try adding a different video.',
+        });
+
+        return next(error);
       }
     });
 

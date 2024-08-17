@@ -1,15 +1,21 @@
 const { isValidObjectId } = require('mongoose');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { Like } = require('../../models/like.model');
+const CustomError = require('../../utils/Error');
 
-const toggleTweetLike = asyncHandler(async (req, res) => {
+const toggleTweetLike = asyncHandler(async (req, res, next) => {
   const { tweetId } = req.params;
 
   // check valid tweetId
   if (!isValidObjectId(tweetId)) {
-    throw new ApiError(404, 'Invalid Tweet ID');
+    const error = CustomError.notFound({
+      message: 'Invalid Tweet ID',
+      errors: ['The specified Tweet ID does not match any records.'],
+      hints: 'Please check the Tweet ID and try again.',
+    });
+
+    return next(error);
   }
 
   // search the tweet that already liked or not
@@ -35,7 +41,15 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
   const createdLike = await Like.findById(like._id);
 
   if (!createdLike) {
-    throw new ApiError(500, 'Something went wrong while liking the tweet');
+    const error = CustomError.serverError({
+      message: 'Something went wrong while liking the tweet',
+      errors: [
+        'The system encountered an issue while processing your like request.',
+      ],
+      hints: 'Please try again later',
+    });
+
+    return next(error);
   }
 
   // return response

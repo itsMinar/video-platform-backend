@@ -1,26 +1,35 @@
 const { isValidObjectId } = require('mongoose');
 const { Comment } = require('../../models/comment.model');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
+const CustomError = require('../../utils/Error');
 
-const deleteComment = asyncHandler(async (req, res) => {
+const deleteComment = asyncHandler(async (req, res, next) => {
   const { commentId } = req.params;
 
   // check valid commentId
   if (!isValidObjectId(commentId)) {
-    throw new ApiError(404, 'Invalid Comment ID');
+    const error = CustomError.badRequest({
+      message: 'Invalid Comment ID',
+      errors: ['The provided Comment ID is not valid.'],
+      hints: 'Please ensure that the Comment ID is correct and try again.',
+    });
+
+    return next(error);
   }
 
-  // find comment by the Comment ID from DB
-  const comment = await Comment.findById(commentId);
+  // find and delete the comment by the Comment ID
+  const comment = await Comment.findByIdAndDelete(commentId);
 
   if (!comment) {
-    throw new ApiError(400, 'Comment not found!');
-  }
+    const error = CustomError.notFound({
+      message: 'Comment not found!',
+      errors: ['The specified comment could not be located.'],
+      hints: 'Please verify the comment ID and try again.',
+    });
 
-  // delete comment from the DB
-  await comment.deleteOne();
+    return next(error);
+  }
 
   // return response
   return res

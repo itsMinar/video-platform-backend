@@ -117,6 +117,10 @@ Once the server is running, you can interact with the API using an HTTP client l
 
 ## API Endpoints
 
+### Health Check
+
+- `GET /health`: Check the Application health that everything is ok or not
+
 ### User
 
 - `POST /api/v1/users/register`: Register a new user
@@ -180,10 +184,6 @@ Once the server is running, you can interact with the API using an HTTP client l
 - `GET /api/v1/tweets/user/:userId`: Get the current user's tweets
 - `PATCH /api/v1/tweets/:tweetId`: Update a tweet
 - `DELETE /api/v1/tweets/:tweetId`: Delete a tweet
-
-### Health Check
-
-- `GET /api/v1/health-check`: Check the Application health that everything is ok or not
 
 ## Environment Variables
 

@@ -1,29 +1,47 @@
 const { Video } = require('../../models/video.model');
 const { ApiResponse } = require('../../utils/ApiResponse');
-const { ApiError } = require('../../utils/ApiError');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { isValidObjectId } = require('mongoose');
 const {
   deleteFromCloudinary,
   getCloudinaryId,
 } = require('../../utils/cloudinary');
+const CustomError = require('../../utils/Error');
 
-const deleteVideo = asyncHandler(async (req, res) => {
+const deleteVideo = asyncHandler(async (req, res, next) => {
   const { videoId } = req.params;
 
   // check valid videoId
   if (!isValidObjectId(videoId)) {
-    throw new ApiError(404, 'Invalid Video ID');
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: ['Invalid Video ID'],
+      hints: 'Please check the Video ID and try again.',
+    });
+
+    return next(error);
   }
 
   const video = await Video.findById(videoId).populate('owner', 'fullName');
 
   if (!video) {
-    throw new ApiError(404, 'Video not Found.');
+    const error = CustomError.notFound({
+      message: 'Video not found',
+      errors: ['The specified video could not be found.'],
+      hints: 'Please check the video ID and try again.',
+    });
+
+    return next(error);
   }
 
   if (video.owner._id.toString() !== req.user._id.toString()) {
-    throw new ApiError(400, 'You Can not Delete this Video!');
+    const error = CustomError.badRequest({
+      message: 'You cannot delete this video!',
+      errors: ['The video you are trying to delete does not belong to you.'],
+      hints: 'Please check the video ownership and try again.',
+    });
+
+    return next(error);
   }
 
   // find the thumbnailId and videoId from the video
@@ -43,7 +61,15 @@ const deleteVideo = asyncHandler(async (req, res) => {
     thumbnailDeletion.error ||
     videoDeletion.error
   ) {
-    throw new ApiError(500, 'Error Deleting Video from Cloudinary');
+    const error = CustomError.serverError({
+      message: 'Error Deleting Video from Cloudinary',
+      errors: [
+        'An error occurred while trying to delete the video from Cloudinary.',
+      ],
+      hints: 'Please try again later. If the issue persists, contact support.',
+    });
+
+    return next(error);
   }
 
   // delete video from DB

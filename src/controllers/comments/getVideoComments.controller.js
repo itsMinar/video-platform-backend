@@ -2,13 +2,20 @@ const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { Comment } = require('../../models/comment.model');
 const { isValidObjectId, Types } = require('mongoose');
+const CustomError = require('../../utils/Error');
 
-const getVideoComments = asyncHandler(async (req, res) => {
+const getVideoComments = asyncHandler(async (req, res, next) => {
   const { videoId } = req.params;
 
   // check valid videoId
   if (!isValidObjectId(videoId)) {
-    throw new ApiError(404, 'Invalid Video ID');
+    const error = CustomError.badRequest({
+      message: 'Invalid Video ID',
+      errors: ['The provided Video ID is not valid.'],
+      hints: 'Please ensure that the Video ID is correct and try again.',
+    });
+
+    return next(error);
   }
 
   const comments = await Comment.aggregate([

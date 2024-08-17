@@ -1,7 +1,7 @@
 const { User } = require('../models/user.model');
-const { ApiError } = require('../utils/ApiError');
 const { asyncHandler } = require('../utils/asyncHandler');
 const jwt = require('jsonwebtoken');
+const CustomError = require('../utils/Error');
 
 const verifyJWT = asyncHandler(async (req, _res, next) => {
   try {
@@ -10,7 +10,13 @@ const verifyJWT = asyncHandler(async (req, _res, next) => {
       req.header('Authorization')?.replace('Bearer ', '');
 
     if (!token) {
-      throw new ApiError(401, 'Unauthorized request');
+      const error = CustomError.unauthorized({
+        message: 'Unauthorized request',
+        errors: ['Token is required for authentication'],
+        hints: 'Please provide a valid token to access this resource.',
+      });
+
+      return next(error);
     }
 
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -20,14 +26,28 @@ const verifyJWT = asyncHandler(async (req, _res, next) => {
     );
 
     if (!user) {
-      throw new ApiError(401, 'Invalid Access Token');
+      const error = CustomError.unauthorized({
+        message: 'Invalid Access Token',
+        errors: ['The provided access token is invalid or has expired'],
+        hints: 'Please provide a valid access token and try again.',
+      });
+
+      return next(error);
     }
 
     req.user = user;
 
     next();
-  } catch (error) {
-    throw new ApiError(401, error?.message || 'Invalid Access Token');
+  } catch (err) {
+    const error = CustomError.unauthorized({
+      message: err?.message || 'Invalid Access Token',
+      errors: [
+        err?.message || 'The provided access token is invalid or has expired',
+      ],
+      hints: 'Please provide a valid access token and try again.',
+    });
+
+    return next(error);
   }
 });
 

@@ -1,27 +1,52 @@
+const { z } = require('zod');
 const { isValidObjectId } = require('mongoose');
+const { Video } = require('../../models/video.model');
 const { Comment } = require('../../models/comment.model');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
+const CustomError = require('../../utils/Error');
 
-const addComment = asyncHandler(async (req, res) => {
+const addComment = asyncHandler(async (req, res, next) => {
   const { videoId } = req.params;
-  const { content } = req.body;
 
-  // check valid videoId
-  if (!isValidObjectId(videoId)) {
-    throw new ApiError(404, 'Invalid Video ID');
-  }
+  const schema = z.object({
+    content: z.string({ message: 'Comment content is required' }),
+    videoId: z
+      .string({ message: 'Video ID is required' })
+      .refine((id) => isValidObjectId(id), {
+        message: 'Invalid Video ID',
+      }),
+  });
 
   // validation - not empty
-  if (!content) {
-    throw new ApiError(400, 'All fields are required');
+  const validation = schema.safeParse({ ...req.body, videoId });
+
+  if (!validation.success) {
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: validation.error.errors.map((err) => err.message),
+      hints: 'Please provide all the required fields',
+    });
+
+    return next(error);
+  }
+
+  // Check if the video exists using videoId from the request
+  const video = await Video.findById(validation.data.videoId);
+  if (!video) {
+    const error = CustomError.notFound({
+      message: 'Video not found!',
+      errors: ['The video associated with this comment does not exist.'],
+      hints: 'Please ensure that the video ID is correct and try again.',
+    });
+
+    return next(error);
   }
 
   // create comment object - create entry in DB
   const comment = await Comment.create({
-    content,
-    video: videoId,
+    content: validation.data.content,
+    video: validation.data.videoId,
     owner: req.user._id,
   });
 
@@ -30,7 +55,12 @@ const addComment = asyncHandler(async (req, res) => {
 
   // check for user creation
   if (!createdComment) {
-    throw new ApiError(500, 'Something went wrong while adding the comment');
+    const error = CustomError.serverError({
+      message: 'Something went wrong while adding the comment',
+      errors: ['Comment could not be added due to an internal server error.'],
+    });
+
+    return next(error);
   }
 
   // return response

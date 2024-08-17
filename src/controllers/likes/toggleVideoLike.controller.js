@@ -1,15 +1,21 @@
 const { isValidObjectId } = require('mongoose');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { Like } = require('../../models/like.model');
+const CustomError = require('../../utils/Error');
 
-const toggleVideoLike = asyncHandler(async (req, res) => {
+const toggleVideoLike = asyncHandler(async (req, res, next) => {
   const { videoId } = req.params;
 
   // check valid videoId
   if (!isValidObjectId(videoId)) {
-    throw new ApiError(404, 'Invalid Video ID');
+    const error = CustomError.notFound({
+      message: 'Invalid Video ID',
+      errors: ['The specified Video ID does not match any records.'],
+      hints: 'Please check the Video ID and try again.',
+    });
+
+    return next(error);
   }
 
   // search the video that already liked or not
@@ -35,7 +41,15 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
   const createdLike = await Like.findById(like._id);
 
   if (!createdLike) {
-    throw new ApiError(500, 'Something went wrong while liking the video');
+    const error = CustomError.serverError({
+      message: 'Something went wrong while liking the video',
+      errors: [
+        'The system encountered an issue while processing your like request.',
+      ],
+      hints: 'Please try again later',
+    });
+
+    return next(error);
   }
 
   // return response

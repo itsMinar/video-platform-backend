@@ -1,5 +1,4 @@
 const { User } = require('../../models/user.model');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const {
@@ -7,19 +6,31 @@ const {
   getCloudinaryId,
   deleteFromCloudinary,
 } = require('../../utils/cloudinary');
+const CustomError = require('../../utils/Error');
 
-const updateUserCoverImage = asyncHandler(async (req, res) => {
+const updateUserCoverImage = asyncHandler(async (req, res, next) => {
   const coverImageLocalPath = req.file?.path;
 
   if (!coverImageLocalPath) {
-    throw new ApiError(400, 'Cover Image is required');
+    const error = CustomError.badRequest({
+      message: 'Cover image is required',
+      errors: ['No cover image was provided in the request.'],
+      hints: 'Please upload a cover image and try again.',
+    });
+
+    return next(error);
   }
 
   // upload them to cloudinary, avatar
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!coverImage.url) {
-    throw new ApiError(400, 'Error while uploading on Cover Image');
+    const error = CustomError.serverError({
+      message: 'Error while uploading the Cover Image',
+      errors: ['An error occurred during the Cover Image upload process.'],
+    });
+
+    return next(error);
   }
 
   // find the coverImageId from the user cover image url
@@ -36,7 +47,14 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     coverImageDeletion.deleted[coverImageIdOfCloudinary] === 'not_found' ||
     coverImageDeletion.error
   ) {
-    throw new ApiError(500, 'Error Deleting Cover Image from Cloudinary');
+    const error = CustomError.serverError({
+      message: 'Error Deleting Cover Image from Cloudinary',
+      errors: [
+        'An error occurred while trying to delete the cover image from Cloudinary.',
+      ],
+    });
+
+    return next(error);
   }
 
   const user = await User.findByIdAndUpdate(

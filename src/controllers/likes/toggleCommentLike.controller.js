@@ -1,15 +1,21 @@
 const { isValidObjectId } = require('mongoose');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { Like } = require('../../models/like.model');
+const CustomError = require('../../utils/Error');
 
-const toggleCommentLike = asyncHandler(async (req, res) => {
+const toggleCommentLike = asyncHandler(async (req, res, next) => {
   const { commentId } = req.params;
 
   // check valid commentId
   if (!isValidObjectId(commentId)) {
-    throw new ApiError(404, 'Invalid Comment ID');
+    const error = CustomError.notFound({
+      message: 'Invalid Comment ID',
+      errors: ['The specified Comment ID does not match any records.'],
+      hints: 'Please check the Comment ID and try again.',
+    });
+
+    return next(error);
   }
 
   // search the comment that already liked or not
@@ -35,7 +41,15 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
   const createdLike = await Like.findById(like._id);
 
   if (!createdLike) {
-    throw new ApiError(500, 'Something went wrong while liking the comment');
+    const error = CustomError.serverError({
+      message: 'Something went wrong while liking the comment',
+      errors: [
+        'The system encountered an issue while processing your like request.',
+      ],
+      hints: 'Please try again later',
+    });
+
+    return next(error);
   }
 
   // return response

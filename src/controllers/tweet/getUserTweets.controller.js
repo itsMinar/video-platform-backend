@@ -1,22 +1,34 @@
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { ApiResponse } = require('../../utils/ApiResponse');
-const { ApiError } = require('../../utils/ApiError');
 const { isValidObjectId, Types } = require('mongoose');
 const { User } = require('../../models/user.model');
 const { Tweet } = require('../../models/tweet.model');
+const CustomError = require('../../utils/Error');
 
-const getUserTweets = asyncHandler(async (req, res) => {
+const getUserTweets = asyncHandler(async (req, res, next) => {
   const { userId } = req.params;
 
   // check valid userId
   if (!isValidObjectId(userId)) {
-    throw new ApiError(404, 'Invalid User ID');
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: ['Invalid User ID'],
+      hints: 'Please check the User ID and try again.',
+    });
+
+    return next(error);
   }
 
   const user = await User.findById(userId).select('username');
 
   if (!user) {
-    throw new ApiError(404, 'User not found!');
+    const error = CustomError.notFound({
+      message: 'User not found',
+      errors: ['The specified user could not be found.'],
+      hints: 'Please check the user ID and try again.',
+    });
+
+    return next(error);
   }
 
   const allTweets = await Tweet.aggregate([

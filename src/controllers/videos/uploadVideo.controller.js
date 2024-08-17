@@ -1,16 +1,28 @@
+const { z } = require('zod');
 const { Video } = require('../../models/video.model');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { uploadOnCloudinary } = require('../../utils/cloudinary');
+const CustomError = require('../../utils/Error');
 
-const uploadVideo = asyncHandler(async (req, res) => {
-  // get video details from client
-  const { title, description } = req.body;
+const uploadVideo = asyncHandler(async (req, res, next) => {
+  const schema = z.object({
+    title: z.string({ message: 'Video title is required' }),
+    description: z
+      .string({ message: 'Tweet content is required' })
+      .min(4, 'Tweet content must be at least 4 characters'),
+  });
 
-  // validation - not empty
-  if ([title, description].some((field) => field?.trim() === '')) {
-    throw new ApiError(400, 'All fields are required');
+  const validation = schema.safeParse(req.body);
+
+  if (!validation.success) {
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: validation.error.errors.map((err) => err.message),
+      hints: 'Please provide all the required fields',
+    });
+
+    return next(error);
   }
 
   // check for video file
@@ -26,11 +38,23 @@ const uploadVideo = asyncHandler(async (req, res) => {
   }
 
   if (!videoFileLocalPath) {
-    throw new ApiError(400, 'Video file is required');
+    const error = CustomError.badRequest({
+      message: 'Video file is required',
+      errors: ['No video file was provided in the request.'],
+      hints: 'Please upload a video file and try again.',
+    });
+
+    return next(error);
   }
 
   if (!videoThumbnailLocalPath) {
-    throw new ApiError(400, 'Video Thumbnail is required');
+    const error = CustomError.badRequest({
+      message: 'Video Thumbnail is required',
+      errors: ['No video thumbnail was provided in the request.'],
+      hints: 'Please upload a video thumbnail and try again.',
+    });
+
+    return next(error);
   }
 
   // upload them to cloudinary
@@ -38,13 +62,21 @@ const uploadVideo = asyncHandler(async (req, res) => {
   const videoThumbnail = await uploadOnCloudinary(videoThumbnailLocalPath);
 
   if (!videoFile || !videoThumbnail) {
-    throw new ApiError(400, 'Video file and Thumbnail is required');
+    const error = CustomError.badRequest({
+      message: 'Video file and Thumbnail are required',
+      errors: [
+        'Both a video file and a thumbnail are required in the request.',
+      ],
+      hints:
+        'Please ensure that both the video file and the thumbnail are provided and try again.',
+    });
+
+    return next(error);
   }
 
   // create video object - create entry in DB
   const video = await Video.create({
-    title,
-    description,
+    ...validation.data,
     videoFile: videoFile.url,
     duration: videoFile.duration,
     thumbnail: videoThumbnail.url,
@@ -55,7 +87,13 @@ const uploadVideo = asyncHandler(async (req, res) => {
 
   // check for user creation
   if (!createdVideo) {
-    throw new ApiError(500, 'Something went wrong while uploading the video');
+    const error = CustomError.serverError({
+      message: 'Something went wrong while uploading the video',
+      errors: ['An error occurred during the video upload process.'],
+      hints: 'Please try again later. If the issue persists, contact support.',
+    });
+
+    return next(error);
   }
 
   // return response

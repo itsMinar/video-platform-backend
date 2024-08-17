@@ -1,5 +1,4 @@
 const { User } = require('../../models/user.model');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const {
@@ -7,19 +6,31 @@ const {
   getCloudinaryId,
   deleteFromCloudinary,
 } = require('../../utils/cloudinary');
+const CustomError = require('../../utils/Error');
 
-const updateUserAvatar = asyncHandler(async (req, res) => {
+const updateUserAvatar = asyncHandler(async (req, res, next) => {
   const avatarLocalPath = req.file?.path;
 
   if (!avatarLocalPath) {
-    throw new ApiError(400, 'Avatar file is required');
+    const error = CustomError.badRequest({
+      message: 'Avatar is required',
+      errors: ['No avatar was provided in the request.'],
+      hints: 'Please upload a avatar and try again.',
+    });
+
+    return next(error);
   }
 
   // upload them to cloudinary, avatar
   const avatar = await uploadOnCloudinary(avatarLocalPath);
 
   if (!avatar.url) {
-    throw new ApiError(400, 'Error while uploading on Avatar');
+    const error = CustomError.serverError({
+      message: 'Error while uploading the avatar',
+      errors: ['An error occurred during the avatar upload process.'],
+    });
+
+    return next(error);
   }
 
   // find the avatarId from the user avatar url
@@ -36,7 +47,14 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     avatarDeletion.deleted[avatarIdOfCloudinary] === 'not_found' ||
     avatarDeletion.error
   ) {
-    throw new ApiError(500, 'Error Deleting User Avatar from Cloudinary');
+    const error = CustomError.serverError({
+      message: 'Error Deleting avatar from Cloudinary',
+      errors: [
+        'An error occurred while trying to delete the avatar from Cloudinary.',
+      ],
+    });
+
+    return next(error);
   }
 
   const user = await User.findByIdAndUpdate(

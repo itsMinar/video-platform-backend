@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const CustomError = require('../utils/Error.js');
+const errorMiddleware = require('../middlewares/error.middleware.js');
 
 // initialize the express app
 const app = express();
@@ -20,7 +22,6 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 // routes import
-const healthCheckRouter = require('../routes/healthcheck.routes.js');
 const userRouter = require('../routes/user.routes.js');
 const videoRouter = require('../routes/video.routes.js');
 const subscriptionRouter = require('../routes/subscription.routes.js');
@@ -31,7 +32,6 @@ const dashboardRouter = require('../routes/dashboard.routes.js');
 const tweetRouter = require('../routes/tweet.routes.js');
 
 // routes declaration
-app.use('/api/v1/health-check', healthCheckRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/videos', videoRouter);
 app.use('/api/v1/subscriptions', subscriptionRouter);
@@ -41,13 +41,25 @@ app.use('/api/v1/playlists', playlistRouter);
 app.use('/api/v1/dashboard', dashboardRouter);
 app.use('/api/v1/tweets', tweetRouter);
 
-// Not Found Handler
-app.use((_req, res) => {
-  res.json({
-    message: 'Resource Not Found',
-    error: 'The requested resource does not exist',
-    hints: 'Please check the URL and try again',
+// health check
+app.get('/health', (_req, res) => {
+  res.status(200).json({
+    success: true,
+    message: '🚀 Catalog Service is up and running',
   });
 });
+
+// Not Found Handler
+app.use((_req, res) => {
+  const error = CustomError.notFound({
+    message: 'Resource Not Found',
+    errors: ['The requested resource does not exist'],
+    hints: 'Please check the URL and try again',
+  });
+  res.status(error.status).json({ ...error, status: undefined });
+});
+
+// Global Error Handler
+app.use(errorMiddleware);
 
 module.exports = { app };

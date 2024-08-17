@@ -2,14 +2,20 @@ const { isValidObjectId, Types } = require('mongoose');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { Subscription } = require('../../models/subscription.model');
-const { ApiError } = require('../../utils/ApiError');
+const CustomError = require('../../utils/Error');
 
-const getSubscribedChannels = asyncHandler(async (req, res) => {
+const getSubscribedChannels = asyncHandler(async (req, res, next) => {
   const { subscriberId } = req.params;
 
   // check valid subscriberId
   if (!isValidObjectId(subscriberId)) {
-    throw new ApiError(404, 'Invalid Subscriber ID');
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: ['Invalid Subscriber ID'],
+      hints: 'Please check the Subscriber ID and try again.',
+    });
+
+    return next(error);
   }
 
   const channelList = await Subscription.aggregate([

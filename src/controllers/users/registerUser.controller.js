@@ -1,27 +1,53 @@
+const { z } = require('zod');
 const { User } = require('../../models/user.model');
-const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
 const { uploadOnCloudinary } = require('../../utils/cloudinary');
+const CustomError = require('../../utils/Error');
 
-const registerUser = asyncHandler(async (req, res) => {
-  // get user details from client
-  const { fullName, email, username, password } = req.body;
+const registerUser = asyncHandler(async (req, res, next) => {
+  const schema = z.object({
+    fullName: z
+      .string({ message: 'fullName is Required' })
+      .min(2, 'fullName must be at least 2 characters'),
+    email: z
+      .string({ message: 'email is Required' })
+      .email({ message: 'Invalid email format' }),
+    username: z.string({ message: 'username is required' }),
+    password: z
+      .string({ message: 'password is required' })
+      .min(6, 'password must be at least 6 characters'),
+  });
 
-  // validation - not empty
-  if (
-    [fullName, email, username, password].some((field) => field?.trim() === '')
-  ) {
-    throw new ApiError(400, 'All fields are required');
+  const validation = schema.safeParse(req.body);
+
+  if (!validation.success) {
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: validation.error.errors.map((err) => err.message),
+      hints: 'Please provide all the required fields',
+    });
+
+    return next(error);
   }
 
   // check if user already exists: username, email
   const existedUser = await User.findOne({
-    $or: [{ username }, { email }],
+    $or: [
+      { username: validation.data.username },
+      { email: validation.data.email },
+    ],
   });
 
   if (existedUser) {
-    throw new ApiError(409, 'User with email or username already exists');
+    const error = CustomError.conflict({
+      message: 'Resource Conflict',
+      errors: ['User with email or username already exists'],
+      hints:
+        'Ensure the resource you are trying to create does not already exist.',
+    });
+
+    return next(error);
   }
 
   // check for images, check for avatar
@@ -37,7 +63,13 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   if (!avatarLocalPath) {
-    throw new ApiError(400, 'Avatar file is required');
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: ['Avatar file is required'],
+      hints: 'Please provide the avatar file.',
+    });
+
+    return next(error);
   }
 
   // upload them to cloudinary, avatar
@@ -45,17 +77,20 @@ const registerUser = asyncHandler(async (req, res) => {
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!avatar) {
-    throw new ApiError(400, 'Avatar file is required');
+    const error = CustomError.badRequest({
+      message: 'Validation Error',
+      errors: ['Avatar file is required'],
+      hints: 'Please provide the avatar file.',
+    });
+
+    return next(error);
   }
 
   // create user object - create entry in DB
   const user = await User.create({
-    fullName,
-    username: username.toLowerCase(),
+    ...validation.data,
     avatar: avatar.url,
     coverImage: coverImage?.url || '',
-    email,
-    password,
   });
 
   // remove password and refresh token field from response
@@ -65,7 +100,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // check for user creation
   if (!createdUser) {
-    throw new ApiError(500, 'Something went wrong while registering the user');
+    const error = CustomError.serverError({
+      message: 'Something went wrong while registering the user',
+      errors: ['User creation failed. Please try again later.'],
+      hints: 'If the problem persists, please contact our support team.',
+    });
+
+    return next(error);
   }
 
   // return response
