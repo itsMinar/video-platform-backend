@@ -12,10 +12,11 @@ const errorMiddleware = (err, req, res, next) => {
   let error = {
     // status: err.status ? err.status : 500,
     message: errorMessage,
-    errors: [
-      ...err.errors,
-      ...(err?.errors?.length == 0 ? ['Server Error!'] : []),
-    ],
+    // errors: [
+    //   ...err.errors,
+    //   ...(err?.errors?.length == 0 ? ['Server Error!'] : []),
+    // ],
+    errors: Array.isArray(err.errors) ? err.errors : ['Server Error!'],
     hints: err.hints,
   };
 
@@ -30,6 +31,7 @@ const errorMiddleware = (err, req, res, next) => {
   if (err instanceof ZodError) {
     error = {
       ...error,
+      errors: err.errors.map((e) => e.message),
       // status: 422,
     };
   }

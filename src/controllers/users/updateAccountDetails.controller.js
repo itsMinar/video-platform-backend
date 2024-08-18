@@ -14,6 +14,7 @@ const updateAccountDetails = asyncHandler(async (req, res, next) => {
       .string({ message: 'email is Required' })
       .email({ message: 'Invalid email format' })
       .optional(),
+    username: z.string({ message: 'username is required' }).optional(),
   });
 
   const validation = schema.safeParse(req.body);
@@ -23,6 +24,32 @@ const updateAccountDetails = asyncHandler(async (req, res, next) => {
       message: 'Validation Error',
       errors: validation.error.errors.map((err) => err.message),
       hints: 'Please provide all the required fields',
+    });
+
+    return next(error);
+  }
+
+  // check if user already exists: username, email
+  const existedUser = await User.findOne({
+    $or: [
+      { username: validation.data.username },
+      { email: validation.data.email },
+    ],
+  });
+
+  if (existedUser) {
+    const error = CustomError.conflict({
+      message: 'Resource Conflict',
+      errors: [
+        ...(existedUser.email === validation.data.email
+          ? ['Email is already in use']
+          : []),
+        ...(existedUser.username === validation.data.username
+          ? ['Username is already in use']
+          : []),
+      ],
+      hints:
+        'Ensure the resource you are trying to create does not already exist',
     });
 
     return next(error);
