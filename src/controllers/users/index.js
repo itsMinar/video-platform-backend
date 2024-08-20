@@ -1,4 +1,5 @@
 const changeCurrentPassword = require('./changeCurrentPassword.controller');
+const clearWatchHistory = require('./clearWatchHistory.controller');
 const getCurrentUser = require('./getCurrentUser.controller');
 const getUserChannelProfile = require('./getUserChannelProfile.controller');
 const getWatchHistory = require('./getWatchHistory.controller');
@@ -22,4 +23,5 @@ module.exports = {
   updateUserCoverImage,
   getUserChannelProfile,
   getWatchHistory,
+  clearWatchHistory,
 };

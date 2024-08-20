@@ -12,6 +12,7 @@ const {
   updateUserCoverImage,
   getUserChannelProfile,
   getWatchHistory,
+  clearWatchHistory,
 } = require('../controllers/users');
 
 const router = require('express').Router();
@@ -47,5 +48,6 @@ router
 
 router.route('/c/:username').get(verifyJWT, getUserChannelProfile);
 router.route('/history').get(verifyJWT, getWatchHistory);
+router.route('/clear-history').patch(verifyJWT, clearWatchHistory);
 
 module.exports = router;
