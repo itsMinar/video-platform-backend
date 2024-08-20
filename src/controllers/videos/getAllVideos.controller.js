@@ -30,6 +30,28 @@ const getAllVideos = asyncHandler(async (req, res) => {
     { $match: match },
     { $sort: { [sortBy]: sortType === 'desc' ? -1 : 1 } },
     {
+      $lookup: {
+        from: 'users',
+        localField: 'owner',
+        foreignField: '_id',
+        as: 'ownerInfo',
+        pipeline: [
+          {
+            $project: {
+              fullName: 1,
+              username: 1,
+              avatar: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        ownerInfo: { $arrayElemAt: ['$ownerInfo', 0] },
+      },
+    },
+    {
       $facet: {
         metadata: [{ $count: 'total' }],
         data: [{ $skip: skip }, { $limit: limitInt }],
@@ -45,6 +67,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
       $project: {
         total: '$metadata.total',
         data: 1,
+        ownerInfo: 1,
       },
     },
   ];
