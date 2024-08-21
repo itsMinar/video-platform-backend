@@ -134,6 +134,7 @@ Once the server is running, you can interact with the API using an HTTP client l
 - `PATCH /api/v1/users/cover-image`: Update the current user's cover image
 - `GET /api/v1/users/c/:username`: Get a user's channel profile
 - `GET /api/v1/users/history`: Get the current user's watch history
+- `PATCH /api/v1/users/clear-history`: Clear the current user's watch history
 
 ### Video
 

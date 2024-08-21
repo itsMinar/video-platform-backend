@@ -48,6 +48,7 @@ const getVideoComments = asyncHandler(async (req, res, next) => {
         pipeline: [
           {
             $project: {
+              fullName: 1,
               username: 1,
               avatar: 1,
             },
