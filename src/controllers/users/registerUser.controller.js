@@ -2,7 +2,10 @@ const { z } = require('zod');
 const { User } = require('../../models/user.model');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
-const { uploadOnCloudinary } = require('../../utils/cloudinary');
+const {
+  uploadOnCloudinary,
+  deleteFromCloudinary,
+} = require('../../utils/cloudinary');
 const CustomError = require('../../utils/Error');
 
 const registerUser = asyncHandler(async (req, res, next) => {
@@ -50,31 +53,43 @@ const registerUser = asyncHandler(async (req, res, next) => {
     return next(error);
   }
 
-  // check for images, check for avatar
-  const avatarLocalPath = req.files?.avatar[0]?.path;
-
-  let coverImageLocalPath;
-  if (
-    req.files &&
-    Array.isArray(req.files.coverImage) &&
-    req.files.coverImage.length > 0
-  ) {
-    coverImageLocalPath = req.files.coverImage[0].path;
-  }
+  // check for images
+  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
   if (!avatarLocalPath) {
     const error = CustomError.badRequest({
       message: 'Validation Error',
-      errors: ['Avatar file is required'],
+      errors: ['Avatar file is missing'],
       hints: 'Please provide the avatar file',
     });
 
     return next(error);
   }
 
-  // upload them to cloudinary, avatar
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
-  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  let avatar;
+  try {
+    avatar = await uploadOnCloudinary(avatarLocalPath);
+  } catch (err) {
+    const error = CustomError.serverError({
+      message: 'Something went wrong while uploading images.',
+      errors: ['Failed to upload the Avatar.'],
+    });
+
+    return next(error);
+  }
+
+  let coverImage;
+  try {
+    coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  } catch (err) {
+    const error = CustomError.serverError({
+      message: 'Something went wrong while uploading images.',
+      errors: ['Failed to upload the Cover Image.'],
+    });
+
+    return next(error);
+  }
 
   if (!avatar) {
     const error = CustomError.badRequest({
@@ -86,20 +101,44 @@ const registerUser = asyncHandler(async (req, res, next) => {
     return next(error);
   }
 
-  // create user object - create entry in DB
-  const user = await User.create({
-    ...validation.data,
-    avatar: avatar.url,
-    coverImage: coverImage?.url || '',
-  });
+  try {
+    // create user object - create entry in DB
+    const user = await User.create({
+      ...validation.data,
+      avatar: avatar.url,
+      coverImage: coverImage?.url || '',
+    });
 
-  // remove password and refresh token field from response
-  const createdUser = await User.findById(user._id).select(
-    '-password -refreshToken'
-  );
+    // remove password and refresh token field from response
+    const createdUser = await User.findById(user._id).select(
+      '-password -refreshToken'
+    );
 
-  // check for user creation
-  if (!createdUser) {
+    // check for user creation
+    if (!createdUser) {
+      const error = CustomError.serverError({
+        message: 'Something went wrong while registering the user',
+        errors: ['User creation failed. Please try again later.'],
+      });
+
+      return next(error);
+    }
+
+    // return response
+    return res
+      .status(201)
+      .json(new ApiResponse(201, createdUser, 'User Registered Successfully'));
+  } catch (err) {
+    if (avatar) {
+      await deleteFromCloudinary(avatar.public_id, avatar.resource_type);
+    }
+    if (coverImage) {
+      await deleteFromCloudinary(
+        coverImage.public_id,
+        coverImage.resource_type
+      );
+    }
+
     const error = CustomError.serverError({
       message: 'Something went wrong while registering the user',
       errors: ['User creation failed. Please try again later.'],
@@ -107,11 +146,6 @@ const registerUser = asyncHandler(async (req, res, next) => {
 
     return next(error);
   }
-
-  // return response
-  return res
-    .status(201)
-    .json(new ApiResponse(201, createdUser, 'User Registered Successfully'));
 });
 
 module.exports = registerUser;
