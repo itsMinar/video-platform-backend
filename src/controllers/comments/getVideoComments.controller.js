@@ -19,11 +19,7 @@ const getVideoComments = asyncHandler(async (req, res, next) => {
   }
 
   const comments = await Comment.aggregate([
-    {
-      $match: {
-        video: new Types.ObjectId(videoId),
-      },
-    },
+    { $match: { video: new Types.ObjectId(videoId) } },
     {
       $lookup: {
         from: 'likes',
@@ -66,6 +62,7 @@ const getVideoComments = asyncHandler(async (req, res, next) => {
       $project: {
         content: 1,
         totalLikes: 1,
+        liker_list: 1,
         commenter: 1,
         createdAt: 1,
       },

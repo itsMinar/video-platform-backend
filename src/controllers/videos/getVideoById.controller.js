@@ -1,4 +1,4 @@
-const { isValidObjectId } = require('mongoose');
+const { isValidObjectId, Types } = require('mongoose');
 const { Video } = require('../../models/video.model');
 const { User } = require('../../models/user.model');
 const { ApiResponse } = require('../../utils/ApiResponse');
@@ -19,10 +19,58 @@ const getVideoById = asyncHandler(async (req, res, next) => {
     return next(error);
   }
 
-  const video = await Video.findById(videoId).populate(
-    'owner',
-    'fullName avatar username'
-  );
+  // Fetch the video details by aggregation pipeline
+  const result = await Video.aggregate([
+    { $match: { _id: new Types.ObjectId(videoId) } },
+    {
+      $lookup: {
+        from: 'likes',
+        localField: '_id',
+        foreignField: 'video',
+        as: 'liker_list',
+        pipeline: [
+          {
+            $project: {
+              likedBy: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'owner',
+        foreignField: '_id',
+        as: 'owner_info',
+        pipeline: [
+          {
+            $project: {
+              fullName: 1,
+              username: 1,
+              avatar: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        owner: { $arrayElemAt: ['$owner_info', 0] },
+        totalLikes: { $size: '$liker_list' },
+        likers: '$liker_list',
+      },
+    },
+    {
+      $project: {
+        owner_info: 0,
+        liker_list: 0,
+      },
+    },
+  ]);
+
+  // Extract the video details from the aggregation result
+  const video = result[0];
 
   if (!video) {
     const error = CustomError.notFound({
@@ -34,13 +82,14 @@ const getVideoById = asyncHandler(async (req, res, next) => {
     return next(error);
   }
 
-  // Fetch similar videos based on the title
+  // Fetch similar videos based on title
   const similarVideos = await Video.find({
     _id: { $ne: videoId },
     $or: [
-      { title: { $regex: new RegExp(video.title.split(' ').join('|'), 'i') } }, // Split title into words and match any
+      { title: { $regex: new RegExp(video.title.split(' ').join('|'), 'i') } },
     ],
   })
+    .select('videoFile thumbnail title views createdAt')
     .populate('owner', 'fullName username')
     .limit(5);
 
@@ -52,10 +101,8 @@ const getVideoById = asyncHandler(async (req, res, next) => {
     });
   }
 
-  // increase view count
-  video.views++;
-
-  await video.save();
+  // Increase the view count
+  await Video.updateOne({ _id: video._id }, { $inc: { views: 1 } });
 
   // return response
   return res

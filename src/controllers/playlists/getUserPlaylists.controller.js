@@ -21,16 +21,6 @@ const getUserPlaylists = asyncHandler(async (req, res, next) => {
   // find the playlist
   const playlist = await Playlist.find({ owner: userId }).populate('videos');
 
-  if (playlist.length <= 0) {
-    const error = CustomError.notFound({
-      message: 'This user has no Playlist',
-      errors: ['The specified user does not have any playlists.'],
-      hints: 'Please check the user playlist and try again later',
-    });
-
-    return next(error);
-  }
-
   // return response
   return res
     .status(200)

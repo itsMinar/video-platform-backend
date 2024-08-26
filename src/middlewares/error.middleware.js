@@ -12,11 +12,11 @@ const errorMiddleware = (err, req, res, next) => {
   let error = {
     // status: err.status ? err.status : 500,
     message: errorMessage,
-    // errors: [
-    //   ...err.errors,
-    //   ...(err?.errors?.length == 0 ? ['Server Error!'] : []),
-    // ],
-    errors: Array.isArray(err.errors) ? err.errors : ['Server Error!'],
+    errors: Array.isArray(err.errors)
+      ? err.errors.length > 0
+        ? err.errors
+        : ['Server Error!']
+      : ['Server Error!'],
     hints: err.hints,
   };
 
