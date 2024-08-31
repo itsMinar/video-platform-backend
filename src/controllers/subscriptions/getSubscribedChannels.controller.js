@@ -49,13 +49,26 @@ const getSubscribedChannels = asyncHandler(async (req, res, next) => {
       },
     },
     {
+      $addFields: {
+        totalSubscribedChannels: { $size: '$channelList' },
+      },
+    },
+    {
       $project: {
         _id: 0,
         subscriberId: '$_id',
         channelList: 1,
+        totalSubscribedChannels: 1,
       },
     },
   ]);
+
+  // Extract the response from aggregation pipeline
+  const response = channelList[0] ?? {
+    channelList: [],
+    totalSubscribedChannels: 0,
+    subscriberId,
+  };
 
   // return response
   return res
@@ -63,7 +76,7 @@ const getSubscribedChannels = asyncHandler(async (req, res, next) => {
     .json(
       new ApiResponse(
         200,
-        channelList[0],
+        response,
         'User Subscribed Channel List Fetched Successfully'
       )
     );

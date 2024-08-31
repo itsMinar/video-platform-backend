@@ -20,7 +20,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res, next) => {
 
   const subscriberList = await Subscription.aggregate([
     {
-      $match: { channel: Types.ObjectId.createFromHexString(channelId) },
+      $match: { channel: new Types.ObjectId(channelId) },
     },
     {
       $lookup: {
@@ -49,13 +49,26 @@ const getUserChannelSubscribers = asyncHandler(async (req, res, next) => {
       },
     },
     {
+      $addFields: {
+        totalSubscribers: { $size: '$subscribers' },
+      },
+    },
+    {
       $project: {
         _id: 0,
         channelId: '$_id',
         subscribers: 1,
+        totalSubscribers: 1,
       },
     },
   ]);
+
+  // Extract the response from aggregation pipeline
+  const response = subscriberList[0] ?? {
+    subscribers: [],
+    totalSubscribers: 0,
+    channelId,
+  };
 
   // return response
   return res
@@ -63,7 +76,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res, next) => {
     .json(
       new ApiResponse(
         200,
-        subscriberList[0],
+        response,
         'User Channel Subscriber List Fetched Successfully'
       )
     );

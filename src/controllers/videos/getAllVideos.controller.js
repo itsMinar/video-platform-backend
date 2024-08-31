@@ -1,3 +1,4 @@
+const { Types } = require('mongoose');
 const { Video } = require('../../models/video.model');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const { asyncHandler } = require('../../utils/asyncHandler');
@@ -22,7 +23,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     match = { ...match, title: { $regex: query, $options: 'i' } };
   }
   if (userId) {
-    match = { ...match, userId };
+    match = { ...match, owner: new Types.ObjectId(userId) };
   }
 
   // Build the aggregation pipeline
