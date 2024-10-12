@@ -2,6 +2,12 @@
 
 ### This repository contains the backend service for VideoTube, a video platform. The service is built with Node.js, Express.js, MongoDB (Mongoose), and Cloudinary.
 
+## Postman Documentation
+
+#### You can find the complete API documentation at the following link:
+
+### 🔗[Postman API Documentation](https://documenter.getpostman.com/view/17734776/2sAXxS8X9i)
+
 ## Table of Contents
 
 - [Features](#features)
