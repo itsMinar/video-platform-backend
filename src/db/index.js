@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { DB_NAME } = require('../constants/db');
+const logger = require('../logger/winston.logger');
 
 const connectDB = async () => {
   try {
@@ -7,11 +8,11 @@ const connectDB = async () => {
       dbName: DB_NAME,
     });
 
-    console.log(
-      `\nMongoDB Connected!! DB HOST: ${connectionInstance.connection.host} 📄`
+    logger.info(
+      `☘️  MongoDB Connected! DB HOST: ${connectionInstance.connection.host}\n`
     );
   } catch (error) {
-    console.log('MONGODB Connection FAILED', error);
+    logger.error('MongoDB Connection Failed: ', error);
     process.exit(1);
   }
 };

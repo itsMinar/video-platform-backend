@@ -1,5 +1,6 @@
 const { v2: cloudinary } = require('cloudinary');
 const fs = require('fs');
+const logger = require('../logger/winston.logger');
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -37,7 +38,7 @@ const deleteFromCloudinary = async (contentId, contentType) => {
 
     return response;
   } catch (error) {
-    console.log('🚀 ~ deleteFromCloudinary ~ error:', error);
+    logger.error('🚀 ~ deleteFromCloudinary ~ error:', error);
 
     throw new Error('Failed to delete content from Cloudinary');
   }
